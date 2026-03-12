@@ -1,0 +1,26 @@
+{
+  "name": "energytracker",
+  "version": "1.0.0",
+  "description": "아파트 월패드의 전기 사용량 데이터를 사진 촬영을 통해 간편하게 디지털 데이터로 변환하고, 모바일에서 차트로 관리할 수 있는 애플리케이션입니다.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielk0121/energytracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/danielk0121/energytracker/issues"
+  },
+  "homepage": "https://github.com/danielk0121/energytracker#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.4.0"
+  }
+}
