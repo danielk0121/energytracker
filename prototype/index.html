@@ -299,7 +299,7 @@
             yAxis.innerHTML = '';
             wrapper.querySelectorAll('.grid-line').forEach(el => el.remove());
 
-            const step = maxUsage > 100 ? 50 : (maxUsage > 30 ? 10 : 5);
+            const step = maxUsage > 100 ? 50 : (maxUsage > 30 ? 10 : 2);
             const maxVal = Math.ceil(maxUsage / step) * step;
             const stepsCount = maxVal / step;
 
