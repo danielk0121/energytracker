@@ -82,7 +82,7 @@
 
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: var(--chart-bg); border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; overflow: hidden; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #border-color; font-size: 10px; color: var(--secondary-text); text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
         .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; z-index: 5; }
         .chart-container:active { cursor: grabbing; }
         .chart-container::-webkit-scrollbar { display: none; }
@@ -96,6 +96,12 @@
         .bar.min .value-label { color: var(--down-color); }
         .monthly .bar { min-width: 50px; }
         
+        /* 예측 섹션 스타일 */
+        .prediction-content { display: flex; justify-content: space-around; text-align: center; padding: 10px 0; }
+        .prediction-item { flex: 1; }
+        .prediction-value { font-size: 24px; font-weight: bold; color: var(--primary-blue); display: block; margin-top: 5px; }
+        .prediction-label { font-size: 12px; color: var(--secondary-text); }
+
         /* 탭 스타일 */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .tab-btn { background: none; border: none; padding: 8px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--secondary-text); border-radius: 20px; transition: all 0.2s; width: auto; }
@@ -109,7 +115,6 @@
         .data-list tr:hover { background-color: var(--border-color); }
         .usage-val { font-weight: bold; color: var(--primary-blue); }
         
-        /* 날짜 컬럼 너비 확보 및 줄바꿈 방지 */
         .date-col { white-space: nowrap; font-size: 13px; min-width: 90px; }
         
         /* 변동폭 스타일 */
@@ -121,7 +126,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2200-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2210-kst</span>
         <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
     </div>
     
@@ -186,6 +191,25 @@
             <div id="daily-y-axis" class="y-axis"></div>
             <div id="daily-chart" class="chart-container"></div>
         </div>
+    </div>
+
+    <!-- 이번 달 사용량 합계 예측 섹션 추가 -->
+    <div class="card">
+        <h3>이번 달 사용량 예측 (2026년 3월)</h3>
+        <div class="prediction-content">
+            <div class="prediction-item">
+                <span class="prediction-label">현재 누적</span>
+                <span id="current-month-sum" class="prediction-value">0 kWh</span>
+            </div>
+            <div id="prediction-divider" style="width: 1px; background: var(--border-color);"></div>
+            <div class="prediction-item">
+                <span class="prediction-label">월말 예상</span>
+                <span id="predicted-month-total" class="prediction-value" style="color: var(--up-color);">0 kWh</span>
+            </div>
+        </div>
+        <p style="font-size: 11px; color: var(--secondary-text); text-align: center; margin-top: 10px;">
+            * 현재까지의 일평균 사용량을 기준으로 한 단순 예측치입니다.
+        </p>
     </div>
 
     <!-- 4. 상세 사용 기록 -->
@@ -388,6 +412,25 @@
             renderDailyChart();
             renderMonthlyChart();
             renderUsageList();
+            updatePrediction();
+        };
+
+        // 이번 달 사용량 예측 로직
+        const updatePrediction = () => {
+            const currentMonth = "2026-03";
+            const monthData = currentData.filter(d => d.date.startsWith(currentMonth));
+            const sum = monthData.reduce((acc, cur) => acc + cur.usage, 0);
+            const daysPassed = monthData.length;
+            const totalDaysInMonth = 31; // 3월 기준
+
+            document.getElementById('current-month-sum').textContent = `${sum.toFixed(1)} kWh`;
+            
+            if (daysPassed > 0) {
+                const predicted = (sum / daysPassed) * totalDaysInMonth;
+                document.getElementById('predicted-month-total').textContent = `${predicted.toFixed(1)} kWh`;
+            } else {
+                document.getElementById('predicted-month-total').textContent = "- kWh";
+            }
         };
 
         const drawYAxisAndGrid = (wrapperId, yAxisId, maxUsage) => {
