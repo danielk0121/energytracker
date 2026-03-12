@@ -15,6 +15,11 @@
         .summary-max { color: #ea4335; font-weight: bold; }
         .summary-min { color: #34a853; font-weight: bold; }
 
+        /* 필터 버튼 그룹 */
+        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .filter-btn { background-color: #f1f3f4; border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; color: #5f6368; transition: all 0.2s; width: auto; }
+        .filter-btn.active { background-color: #1a73e8; color: white; }
+
         /* 업로드 섹션 */
         .upload-section { text-align: center; border: 2px dashed #dadce0; background-color: #f8f9fa; }
         input[type="file"] { display: block; width: 100%; margin: 15px 0; }
@@ -108,9 +113,15 @@
     <!-- 2. 월별 사용량 차트 -->
     <div class="card">
         <h3>
-            <span>월별 사용량 (최근 13개월)</span>
+            <span>월별 사용량</span>
             <div id="monthly-summary" class="title-summary"></div>
         </h3>
+        <!-- 기간 필터 추가 -->
+        <div class="filter-group">
+            <button class="filter-btn active" onclick="updateMonthlyFilter('13months')">최근 13개월</button>
+            <button class="filter-btn" onclick="updateMonthlyFilter('thisyear')">이번 연도</button>
+            <button class="filter-btn" onclick="updateMonthlyFilter('2years')">최근 2년</button>
+        </div>
         <div id="monthly-wrapper" class="chart-wrapper">
             <div id="monthly-y-axis" class="y-axis"></div>
             <div id="monthly-chart" class="chart-container monthly"></div>
@@ -155,7 +166,7 @@
         const generate13MonthsData = () => {
             const data = [];
             const endDate = new Date("2026-03-12");
-            const startDate = new Date("2025-02-01");
+            const startDate = new Date("2025-01-01"); // 최근 2년 필터를 위해 2025년부터 시작
             let seed = 12345;
             const pseudoRandom = () => {
                 seed = (seed * 9301 + 49297) % 233280;
@@ -180,6 +191,7 @@
         let currentData = [...FIXED_DATA];
         let pendingData = []; 
         let currentTab = 'monthly';
+        let monthlyFilter = '13months';
 
         // --- 2. 사진 업로드 및 분석 로직 ---
 
@@ -279,7 +291,15 @@
             resetBtn.style.display = 'none';
         });
 
-        // --- 3. UI 렌더링 및 탭 로직 ---
+        // --- 3. UI 렌더링 및 필터 로직 ---
+
+        const updateMonthlyFilter = (filter) => {
+            monthlyFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.onclick.toString().includes(filter));
+            });
+            renderMonthlyChart();
+        };
 
         const switchTab = (tab) => {
             currentTab = tab;
@@ -326,6 +346,37 @@
             return maxVal;
         };
 
+        const setupDragScroll = (containerId) => {
+            const slider = document.getElementById(containerId);
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+                slider.style.scrollBehavior = 'auto';
+            });
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+                slider.style.scrollBehavior = 'smooth';
+            });
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; 
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        };
+
         const renderDailyChart = () => {
             const container = document.getElementById('daily-chart');
             const summaryContainer = document.getElementById('daily-summary');
@@ -334,11 +385,9 @@
             const maxUsage = Math.max(...usages);
             const minUsage = Math.min(...usages);
             
-            // 최대/최소일 찾기
             const maxDay = recent30.find(d => d.usage === maxUsage).date;
             const minDay = recent30.find(d => d.usage === minUsage).date;
 
-            // 제목 옆 요약 정보 업데이트
             summaryContainer.innerHTML = `
                 <div>최대: <span class="summary-max">${maxUsage.toFixed(1)} kWh</span> (${maxDay})</div>
                 <div>최소: <span class="summary-min">${minUsage.toFixed(1)} kWh</span> (${minDay})</div>
@@ -382,9 +431,27 @@
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
-            const monthlyMap = getMonthlyData();
-            const months = Object.keys(monthlyMap).sort();
-            const usages = Object.values(monthlyMap);
+            
+            // 데이터 집계
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7);
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+
+            let months = Object.keys(monthlyMap).sort();
+            const currentYear = "2026";
+
+            // 필터링 적용
+            if (monthlyFilter === '13months') {
+                months = months.slice(-13);
+            } else if (monthlyFilter === 'thisyear') {
+                months = months.filter(m => m.startsWith(currentYear));
+            } else if (monthlyFilter === '2years') {
+                months = months.slice(-24);
+            }
+
+            const usages = months.map(m => monthlyMap[m]);
             const maxUsage = Math.max(...usages);
             const minUsage = Math.min(...usages);
 
@@ -426,18 +493,16 @@
             });
         };
 
-        const getMonthlyData = () => {
+        const renderUsageList = () => {
+            const tbody = document.getElementById('usage-list-body');
+            tbody.innerHTML = '';
+            
             const monthlyMap = {};
             currentData.forEach(item => {
                 const month = item.date.substring(0, 7);
                 monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
             });
-            return monthlyMap;
-        };
 
-        const renderUsageList = () => {
-            const tbody = document.getElementById('usage-list-body');
-            tbody.innerHTML = '';
             if (currentTab === 'daily') {
                 const sortedData = [...currentData].sort((a, b) => b.date.localeCompare(a.date));
                 sortedData.forEach(item => {
@@ -446,7 +511,6 @@
                     tbody.appendChild(tr);
                 });
             } else {
-                const monthlyMap = getMonthlyData();
                 const sortedMonths = Object.keys(monthlyMap).sort((a, b) => b.localeCompare(a));
                 sortedMonths.forEach(month => {
                     const tr = document.createElement('tr');
@@ -457,6 +521,8 @@
         };
 
         updateUI();
+        setupDragScroll('daily-chart');
+        setupDragScroll('monthly-chart');
     </script>
 </body>
 </html>
