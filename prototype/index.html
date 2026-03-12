@@ -109,9 +109,7 @@
     <div class="card">
         <h3>
             <span>월별 사용량 (최근 13개월)</span>
-            <div id="monthly-summary" class="title-summary">
-                <!-- 최대/최소 요약 정보가 여기에 표시됩니다 -->
-            </div>
+            <div id="monthly-summary" class="title-summary"></div>
         </h3>
         <div id="monthly-wrapper" class="chart-wrapper">
             <div id="monthly-y-axis" class="y-axis"></div>
@@ -121,7 +119,10 @@
 
     <!-- 3. 일자별 사용량 차트 -->
     <div class="card">
-        <h3>일자별 사용량 (최근 30일)</h3>
+        <h3>
+            <span>일자별 사용량 (최근 30일)</span>
+            <div id="daily-summary" class="title-summary"></div>
+        </h3>
         <div id="daily-wrapper" class="chart-wrapper">
             <div id="daily-y-axis" class="y-axis"></div>
             <div id="daily-chart" class="chart-container"></div>
@@ -268,7 +269,6 @@
 
         resetBtn.addEventListener('click', () => {
             if (!confirm('업로드된 사진과 분석 결과를 초기화하시겠습니까?')) return;
-            
             photoInput.value = '';
             thumbnailPreview.innerHTML = '';
             analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>`;
@@ -326,44 +326,24 @@
             return maxVal;
         };
 
-        const setupDragScroll = (containerId) => {
-            const slider = document.getElementById(containerId);
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                slider.classList.add('active');
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-                slider.style.scrollBehavior = 'auto';
-            });
-            slider.addEventListener('mouseleave', () => {
-                isDown = false;
-                slider.classList.remove('active');
-            });
-            slider.addEventListener('mouseup', () => {
-                isDown = false;
-                slider.classList.remove('active');
-                slider.style.scrollBehavior = 'smooth';
-            });
-            slider.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2; 
-                slider.scrollLeft = scrollLeft - walk;
-            });
-        };
-
         const renderDailyChart = () => {
             const container = document.getElementById('daily-chart');
+            const summaryContainer = document.getElementById('daily-summary');
             const recent30 = currentData.slice(-30);
             const usages = recent30.map(d => d.usage);
             const maxUsage = Math.max(...usages);
             const minUsage = Math.min(...usages);
             
+            // 최대/최소일 찾기
+            const maxDay = recent30.find(d => d.usage === maxUsage).date;
+            const minDay = recent30.find(d => d.usage === minUsage).date;
+
+            // 제목 옆 요약 정보 업데이트
+            summaryContainer.innerHTML = `
+                <div>최대: <span class="summary-max">${maxUsage.toFixed(1)} kWh</span> (${maxDay})</div>
+                <div>최소: <span class="summary-min">${minUsage.toFixed(1)} kWh</span> (${minDay})</div>
+            `;
+
             const maxVal = drawYAxisAndGrid('daily-wrapper', 'daily-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
@@ -408,11 +388,9 @@
             const maxUsage = Math.max(...usages);
             const minUsage = Math.min(...usages);
 
-            // 최대/최소월 찾기
             const maxMonth = months.find(m => monthlyMap[m] === maxUsage);
             const minMonth = months.find(m => monthlyMap[m] === minUsage);
 
-            // 제목 옆 요약 정보 업데이트
             summaryContainer.innerHTML = `
                 <div>최대: <span class="summary-max">${maxUsage.toFixed(1)} kWh</span> (${maxMonth})</div>
                 <div>최소: <span class="summary-min">${minUsage.toFixed(1)} kWh</span> (${minMonth})</div>
@@ -479,8 +457,6 @@
         };
 
         updateUI();
-        setupDragScroll('daily-chart');
-        setupDragScroll('monthly-chart');
     </script>
 </body>
 </html>
