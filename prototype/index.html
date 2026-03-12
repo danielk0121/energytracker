@@ -50,10 +50,9 @@
         .summary-max { color: var(--up-color); font-weight: bold; }
         .summary-min { color: var(--down-color); font-weight: bold; }
 
-        /* 필터 버튼 그룹 (한 줄 표시 강제) */
-        .filter-group { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: nowrap; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
-        .filter-group::-webkit-scrollbar { display: none; }
-        .filter-btn { background-color: var(--border-color); border: none; padding: 6px 10px; border-radius: 15px; font-size: 11px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+        /* 필터 버튼 그룹 */
+        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-btn { background-color: var(--border-color); border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; width: auto; }
         .filter-btn.active { background-color: var(--primary-blue); color: white; }
 
         /* 업로드 섹션 */
@@ -122,7 +121,7 @@
 </head>
 <body class="dark-mode">
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2140-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2150-kst</span>
         <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">☀️</button>
     </div>
     
