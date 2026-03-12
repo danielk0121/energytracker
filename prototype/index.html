@@ -82,7 +82,7 @@
 
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: var(--chart-bg); border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; overflow: hidden; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #border-color; font-size: 10px; color: var(--secondary-text); text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid var(--border-color); font-size: 10px; color: var(--secondary-text); text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
         .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; z-index: 5; }
         .chart-container:active { cursor: grabbing; }
         .chart-container::-webkit-scrollbar { display: none; }
@@ -97,10 +97,12 @@
         .monthly .bar { min-width: 32px; }
         
         /* 예측 섹션 스타일 */
-        .prediction-content { display: flex; justify-content: space-around; text-align: center; padding: 10px 0; }
+        .prediction-content { display: flex; justify-content: space-around; text-align: center; padding: 10px 0; gap: 10px; }
         .prediction-item { flex: 1; }
-        .prediction-value { font-size: 24px; font-weight: bold; color: var(--primary-blue); display: block; margin-top: 5px; }
-        .prediction-label { font-size: 12px; color: var(--secondary-text); }
+        .prediction-value { font-size: 20px; font-weight: bold; color: var(--text-color); display: block; margin-top: 5px; }
+        .prediction-label { font-size: 11px; color: var(--secondary-text); white-space: nowrap; }
+        .prediction-highlight { color: var(--primary-blue); font-size: 24px; }
+        .prediction-warn { color: var(--up-color); font-size: 24px; }
 
         /* 탭 스타일 */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
@@ -126,7 +128,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2220-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2230-kst</span>
         <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
     </div>
     
@@ -193,18 +195,28 @@
         </div>
     </div>
 
-    <!-- 이번 달 사용량 합계 예측 섹션 추가 -->
+    <!-- 이번 달 사용량 합계 예측 섹션 -->
     <div class="card">
-        <h3>이번 달 사용량 예측 (2026년 3월)</h3>
+        <h3>이번 달 사용량 예측 (2026.03)</h3>
         <div class="prediction-content">
             <div class="prediction-item">
                 <span class="prediction-label">현재 누적</span>
-                <span id="current-month-sum" class="prediction-value">0 kWh</span>
+                <span id="current-month-sum" class="prediction-value prediction-highlight">0 kWh</span>
             </div>
-            <div id="prediction-divider" style="width: 1px; background: var(--border-color);"></div>
             <div class="prediction-item">
                 <span class="prediction-label">월말 예상</span>
-                <span id="predicted-month-total" class="prediction-value" style="color: var(--up-color);">0 kWh</span>
+                <span id="predicted-month-total" class="prediction-value prediction-warn">0 kWh</span>
+            </div>
+        </div>
+        <div style="height: 1px; background: var(--border-color); margin: 10px 0;"></div>
+        <div class="prediction-content">
+            <div class="prediction-item">
+                <span class="prediction-label">작년 동월(25.03)</span>
+                <span id="last-year-month-sum" class="prediction-value" style="font-size: 16px;">0 kWh</span>
+            </div>
+            <div class="prediction-item">
+                <span class="prediction-label">재작년 동월(24.03)</span>
+                <span id="year-before-last-month-sum" class="prediction-value" style="font-size: 16px;">0 kWh</span>
             </div>
         </div>
         <p style="font-size: 11px; color: var(--secondary-text); text-align: center; margin-top: 10px;">
@@ -247,10 +259,10 @@
         }
 
         // --- 1. 데이터 생성 및 관리 ---
-        const generate13MonthsData = () => {
+        const generateHistoricalData = () => {
             const data = [];
             const endDate = new Date("2026-03-12");
-            const startDate = new Date("2025-01-01"); 
+            const startDate = new Date("2024-01-01"); // 재작년 데이터를 위해 시작일 앞당김
             let seed = 12345;
             const pseudoRandom = () => {
                 seed = (seed * 9301 + 49297) % 233280;
@@ -271,7 +283,7 @@
             return data;
         };
 
-        const FIXED_DATA = generate13MonthsData();
+        const FIXED_DATA = generateHistoricalData();
         let currentData = [...FIXED_DATA];
         let pendingData = []; 
         let currentTab = 'monthly';
@@ -415,22 +427,38 @@
             updatePrediction();
         };
 
-        // 이번 달 사용량 예측 로직
+        // 사용량 예측 로직 (과거 동월 데이터 포함)
         const updatePrediction = () => {
-            const currentMonth = "2026-03";
-            const monthData = currentData.filter(d => d.date.startsWith(currentMonth));
-            const sum = monthData.reduce((acc, cur) => acc + cur.usage, 0);
-            const daysPassed = monthData.length;
-            const totalDaysInMonth = 31; // 3월 기준
+            const currentMonthStr = "2026-03";
+            const lastYearMonthStr = "2025-03";
+            const yearBeforeLastMonthStr = "2024-03";
 
-            document.getElementById('current-month-sum').textContent = `${sum.toFixed(1)} kWh`;
+            // 이번 달 데이터
+            const currentMonthData = currentData.filter(d => d.date.startsWith(currentMonthStr));
+            const currentSum = currentMonthData.reduce((acc, cur) => acc + cur.usage, 0);
+            const daysPassed = currentMonthData.length;
+            const totalDaysInMonth = 31;
+
+            document.getElementById('current-month-sum').textContent = `${currentSum.toFixed(1)} kWh`;
             
             if (daysPassed > 0) {
-                const predicted = (sum / daysPassed) * totalDaysInMonth;
+                const predicted = (currentSum / daysPassed) * totalDaysInMonth;
                 document.getElementById('predicted-month-total').textContent = `${predicted.toFixed(1)} kWh`;
             } else {
                 document.getElementById('predicted-month-total').textContent = "- kWh";
             }
+
+            // 과거 데이터
+            const calculateMonthlySum = (monthStr) => {
+                const monthData = currentData.filter(d => d.date.startsWith(monthStr));
+                return monthData.reduce((acc, cur) => acc + cur.usage, 0);
+            };
+
+            const lastYearSum = calculateMonthlySum(lastYearMonthStr);
+            const yearBeforeLastSum = calculateMonthlySum(yearBeforeLastMonthStr);
+
+            document.getElementById('last-year-month-sum').textContent = lastYearSum > 0 ? `${lastYearSum.toFixed(1)} kWh` : "- kWh";
+            document.getElementById('year-before-last-month-sum').textContent = yearBeforeLastSum > 0 ? `${yearBeforeLastSum.toFixed(1)} kWh` : "- kWh";
         };
 
         const drawYAxisAndGrid = (wrapperId, yAxisId, maxUsage) => {
@@ -563,7 +591,13 @@
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
-            const monthlyMap = getMonthlyData();
+            
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7);
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
             const lastYear = "2025";
@@ -625,15 +659,6 @@
             });
         };
 
-        const getMonthlyData = () => {
-            const monthlyMap = {};
-            currentData.forEach(item => {
-                const month = item.date.substring(0, 7);
-                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
-            });
-            return monthlyMap;
-        };
-
         const renderUsageList = () => {
             const tbody = document.getElementById('usage-list-body');
             tbody.innerHTML = '';
@@ -657,7 +682,11 @@
                     tbody.prepend(tr); 
                 });
             } else {
-                const monthlyMap = getMonthlyData();
+                const monthlyMap = {};
+                currentData.forEach(item => {
+                    const month = item.date.substring(0, 7);
+                    monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+                });
                 const sortedMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
                 sortedMonths.forEach((month, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
