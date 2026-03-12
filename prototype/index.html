@@ -116,6 +116,7 @@
         .tab-btn:hover:not(.active) { background-color: var(--border-color); }
 
         /* 데이터 목록 */
+        .list-container { min-height: 400px; }
         .data-list { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .data-list th, .data-list td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
         .data-list th { background-color: var(--chart-bg); font-weight: 600; color: var(--secondary-text); font-size: 11px; }
@@ -133,7 +134,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1105-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1115-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -248,18 +249,20 @@
             <button id="filter-list-lastyear" class="filter-btn" onclick="updateListFilter('lastyear')">작년</button>
             <button id="filter-list-2years" class="filter-btn" onclick="updateListFilter('2years')">최근 2년</button>
         </div>
-        <table class="data-list">
-            <thead>
-                <tr id="list-header">
-                    <th>날짜</th>
-                    <th>사용량 (kWh)</th>
-                    <th>등락</th>
-                </tr>
-            </thead>
-            <tbody id="usage-list-body">
-                <!-- 목록이 여기에 생성됩니다 -->
-            </tbody>
-        </table>
+        <div class="list-container">
+            <table class="data-list">
+                <thead>
+                    <tr id="list-header">
+                        <th>날짜</th>
+                        <th>사용량 (kWh)</th>
+                        <th>등락</th>
+                    </tr>
+                </thead>
+                <tbody id="usage-list-body">
+                    <!-- 목록이 여기에 생성됩니다 -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
