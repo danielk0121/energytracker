@@ -17,17 +17,27 @@
         button:hover { background-color: #1765cc; }
         
         /* 차트 래퍼 및 y축 */
-        .chart-wrapper { display: flex; height: 260px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 45px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
-        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 4px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; }
+        .chart-wrapper { display: flex; height: 280px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 55px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
+        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 8px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; }
         
         /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
 
-        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 12px; position: relative; cursor: pointer; z-index: 1; }
-        .bar:hover { background-color: #1a73e8; }
+        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; }
+        .bar:hover { background-color: #1a73e8; transform: scaleY(1.02); }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
-        .monthly .bar { background-color: #34a853; min-width: 45px; }
+        
+        /* 최소/최대 강조 */
+        .bar.max { background-color: #ea4335; }
+        .bar.min { background-color: #fbbc05; }
+        .value-label { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: bold; white-space: nowrap; }
+        .bar.max .value-label { color: #ea4335; }
+        .bar.min .value-label { color: #f29900; }
+
+        .monthly .bar { background-color: #34a853; min-width: 50px; }
+        .monthly .bar.max { background-color: #ea4335; }
+        .monthly .bar.min { background-color: #fbbc05; }
         
         /* 탭 스타일 */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f1f3f4; padding-bottom: 10px; }
@@ -102,7 +112,6 @@
     <script>
         // --- 1. 데이터 생성 및 관리 ---
         
-        // 고정된 100일치 샘플 데이터 (2025-12-02 ~ 2026-03-12)
         const FIXED_DATA = [
             { "date": "2025-12-02", "usage": 9.2 }, { "date": "2025-12-03", "usage": 8.1 }, { "date": "2025-12-04", "usage": 7.5 }, { "date": "2025-12-05", "usage": 10.4 }, { "date": "2025-12-06", "usage": 11.8 }, { "date": "2025-12-07", "usage": 6.7 }, { "date": "2025-12-08", "usage": 8.3 }, { "date": "2025-12-09", "usage": 9.5 }, { "date": "2025-12-10", "usage": 7.1 }, { "date": "2025-12-11", "usage": 8.8 },
             { "date": "2025-12-12", "usage": 10.2 }, { "date": "2025-12-13", "usage": 12.5 }, { "date": "2025-12-14", "usage": 9.1 }, { "date": "2025-12-15", "usage": 7.4 }, { "date": "2025-12-16", "usage": 6.9 }, { "date": "2025-12-17", "usage": 8.6 }, { "date": "2025-12-18", "usage": 11.3 }, { "date": "2025-12-19", "usage": 10.1 }, { "date": "2025-12-20", "usage": 7.7 }, { "date": "2025-12-21", "usage": 5.8 },
@@ -213,13 +222,13 @@
             for (let i = 0; i <= stepsCount; i++) {
                 const val = i * step;
                 const label = document.createElement('div');
-                label.textContent = val;
+                label.textContent = (i === stepsCount) ? `${val} kWh` : val;
                 yAxis.appendChild(label);
 
                 // 그리드 라인 추가
                 const line = document.createElement('div');
                 line.className = 'grid-line';
-                const bottomPos = (val / maxVal) * 200 + 50; // padding-bottom 50px 보정
+                const bottomPos = (val / maxVal) * 200 + 50; 
                 line.style.bottom = `${bottomPos}px`;
                 container.appendChild(line);
             }
@@ -229,7 +238,9 @@
         const renderDailyChart = () => {
             const container = document.getElementById('daily-chart');
             const recent30 = currentData.slice(-30);
-            const maxUsage = Math.max(...recent30.map(d => d.usage));
+            const usages = recent30.map(d => d.usage);
+            const maxUsage = Math.max(...usages);
+            const minUsage = Math.min(...usages);
             
             const maxVal = drawYAxisAndGrid('daily-chart', 'daily-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
@@ -238,16 +249,26 @@
             recent30.forEach((item, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
+                if (item.usage === maxUsage) bar.classList.add('max');
+                if (item.usage === minUsage) bar.classList.add('min');
+
                 const height = (item.usage / maxVal) * 200;
                 bar.style.height = `${height}px`;
                 bar.title = `${item.date}: ${item.usage}kWh`;
                 
+                // 최소/최대값 라벨 추가
+                if (item.usage === maxUsage || item.usage === minUsage) {
+                    const valLabel = document.createElement('div');
+                    valLabel.className = 'value-label';
+                    valLabel.textContent = item.usage;
+                    bar.appendChild(valLabel);
+                }
+
                 const label = document.createElement('div');
                 label.className = 'bar-label';
                 const [y, m, d] = item.date.split('-');
                 
                 let labelHtml = `${m}/${d}`;
-                // 차트의 첫 번째 바 또는 연도가 바뀌는 구간에만 연도 표시
                 if (index === 0 || y !== lastYear) {
                     labelHtml += `<br>${y}`;
                     lastYear = y;
@@ -257,13 +278,18 @@
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
+            
+            // 가로 스크롤을 위해 마지막 바로 스크롤
+            setTimeout(() => { container.scrollLeft = container.scrollWidth; }, 100);
         };
 
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const monthlyMap = getMonthlyData();
             const months = Object.keys(monthlyMap).sort();
-            const maxUsage = Math.max(...Object.values(monthlyMap));
+            const usages = Object.values(monthlyMap);
+            const maxUsage = Math.max(...usages);
+            const minUsage = Math.min(...usages);
 
             const maxVal = drawYAxisAndGrid('monthly-chart', 'monthly-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
@@ -273,9 +299,19 @@
                 const usage = monthlyMap[month];
                 const bar = document.createElement('div');
                 bar.className = 'bar';
+                if (usage === maxUsage) bar.classList.add('max');
+                if (usage === minUsage) bar.classList.add('min');
+
                 const height = (usage / maxVal) * 200;
                 bar.style.height = `${height}px`;
                 bar.title = `${month}: ${usage.toFixed(1)}kWh`;
+
+                if (usage === maxUsage || usage === minUsage) {
+                    const valLabel = document.createElement('div');
+                    valLabel.className = 'value-label';
+                    valLabel.textContent = usage.toFixed(1);
+                    bar.appendChild(valLabel);
+                }
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
