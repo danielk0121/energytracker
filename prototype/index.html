@@ -67,14 +67,16 @@
         .thumbnail { width: calc(100% / 6 - 10px); aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; border: 1px solid var(--border-color); background-color: #eee; }
         @media (max-width: 400px) { .thumbnail { width: calc(100% / 4 - 10px); } }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-apply { background-color: #34a853; flex: 2; display: none; }
-        .btn-apply:hover { background-color: #2d8e47; }
-        .btn-reset { background-color: var(--secondary-text); flex: 1; display: none; }
-        .btn-reset:hover { background-color: #494c50; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
+        .btn-group button { width: auto; } /* 기본 width 100% 해제 */
         
-        .upload-btn-reset { background-color: var(--secondary-text); flex: 1; display: none; }
-        .upload-btn-reset:hover { background-color: #494c50; }
+        #analyze-btn { flex: 3; }
+        #upload-reset-btn { flex: 1; min-width: 80px; display: none; background-color: var(--secondary-text); }
+        
+        .btn-apply { background-color: #34a853; flex: 3; display: none; }
+        .btn-apply:hover { background-color: #2d8e47; }
+        .btn-reset { background-color: var(--secondary-text); flex: 1; min-width: 80px; display: none; }
+        .btn-reset:hover { background-color: #494c50; }
 
         /* 분석 결과 섹션 */
         #analysis-results { min-height: 50px; background: var(--chart-bg); border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid var(--border-color); }
@@ -131,7 +133,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0220-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0235-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -150,7 +152,7 @@
         <div id="thumbnail-preview" class="thumbnail-container"></div>
         <div class="btn-group">
             <button id="analyze-btn">사진 분석 시작</button>
-            <button id="upload-reset-btn" class="upload-btn-reset">초기화</button>
+            <button id="upload-reset-btn">초기화</button>
         </div>
     </div>
 
@@ -258,11 +260,9 @@
             const body = document.body;
             const btn = document.querySelector('.theme-btn');
             body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                btn.textContent = '☀️';
-            } else {
-                btn.textContent = '🌙';
-            }
+            const isDark = body.classList.contains('dark-mode');
+            btn.textContent = isDark ? '☀️' : '🌙';
+            sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
         }
 
         // --- 1. 데이터 생성 및 관리 ---
@@ -296,10 +296,50 @@
         let currentTab = 'monthly';
         let monthlyFilter = '13months';
         let dailyFilter = '40days';
-        
-        let uploadedFiles = []; // 업로드된 파일들을 누적으로 관리
+        let uploadedFilesData = []; // Base64 형식으로 파일 데이터 저장
 
-        // --- 2. 사진 업로드 및 분석 로직 ---
+        // --- 2. 상태 보존 (sessionStorage) ---
+        const saveState = () => {
+            const state = {
+                currentData,
+                pendingData,
+                uploadedFilesData,
+                currentTab,
+                monthlyFilter,
+                dailyFilter
+            };
+            sessionStorage.setItem('energyTrackerState', JSON.stringify(state));
+        };
+
+        const loadState = () => {
+            const saved = sessionStorage.getItem('energyTrackerState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                currentData = state.currentData;
+                pendingData = state.pendingData;
+                uploadedFilesData = state.uploadedFilesData || [];
+                currentTab = state.currentTab;
+                monthlyFilter = state.monthlyFilter;
+                dailyFilter = state.dailyFilter;
+                
+                // UI 복구
+                renderThumbnails();
+                if (uploadedFilesData.length > 0) uploadResetBtn.style.display = 'block';
+                
+                if (pendingData.length > 0) {
+                    renderAnalysisResults();
+                    applyBtn.style.display = 'block';
+                    resetBtn.style.display = 'block';
+                }
+                
+                const theme = sessionStorage.getItem('theme');
+                if (theme === 'dark') document.body.classList.add('dark-mode');
+                
+                updateUI();
+            }
+        };
+
+        // --- 3. 사진 업로드 및 분석 로직 ---
         const photoInput = document.getElementById('photo-input');
         const thumbnailPreview = document.getElementById('thumbnail-preview');
         const analyzeBtn = document.getElementById('analyze-btn');
@@ -308,34 +348,46 @@
         const resetBtn = document.getElementById('reset-btn');
         const analysisResults = document.getElementById('analysis-results');
 
-        photoInput.addEventListener('change', (e) => {
+        photoInput.addEventListener('change', async (e) => {
             if (e.target.files && e.target.files.length > 0) {
-                const newFiles = Array.from(e.target.files);
-                uploadedFiles = [...uploadedFiles, ...newFiles];
+                const files = Array.from(e.target.files);
+                for (const file of files) {
+                    const base64 = await fileToBase64(file);
+                    uploadedFilesData.push({ name: file.name, data: base64 });
+                }
                 renderThumbnails();
                 uploadResetBtn.style.display = 'block';
+                saveState();
             }
         });
         
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        };
+        
         const renderThumbnails = () => {
             thumbnailPreview.innerHTML = '';
-            uploadedFiles.forEach(file => {
+            uploadedFilesData.forEach(fileObj => {
                 const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
+                img.src = fileObj.data;
                 img.className = 'thumbnail';
-                img.onload = () => URL.revokeObjectURL(img.src);
                 thumbnailPreview.appendChild(img);
             });
         };
 
-        const mockAnalyzeImage = (files) => {
+        const mockAnalyzeImage = (filesData) => {
             return new Promise((resolve) => {
                 setTimeout(() => {
                     const extracted = [];
                     const baseDate = new Date("2026-03-12"); 
                     let dayOffset = 1;
 
-                    for (let i = 0; i < files.length; i++) {
+                    for (let i = 0; i < filesData.length; i++) {
                         let dataCount = (i === 0) ? 3 : (i === 1 ? 2 : 1);
                         for (let j = 0; j < dataCount; j++) {
                             const date = new Date(baseDate);
@@ -353,7 +405,7 @@
         };
 
         analyzeBtn.addEventListener('click', async () => {
-            if (uploadedFiles.length === 0) {
+            if (uploadedFilesData.length === 0) {
                 alert('분석할 사진을 먼저 선택해주세요.');
                 return;
             }
@@ -363,10 +415,18 @@
             analyzeBtn.textContent = '이미지 분석 중...';
             applyBtn.style.display = 'none';
             resetBtn.style.display = 'block';
-            analysisResults.innerHTML = `<div class="analysis-empty"><strong>${uploadedFiles.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
+            analysisResults.innerHTML = `<div class="analysis-empty"><strong>${uploadedFilesData.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
-            pendingData = await mockAnalyzeImage(uploadedFiles);
+            pendingData = await mockAnalyzeImage(uploadedFilesData);
+            renderAnalysisResults();
             
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = '사진 분석 시작';
+            applyBtn.style.display = 'block'; 
+            saveState();
+        });
+        
+        const renderAnalysisResults = () => {
             let detailHtml = `<p style="color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${pendingData.length}건)</p>`;
             pendingData.forEach((data) => {
                 detailHtml += `
@@ -375,12 +435,8 @@
                         <strong>${data.usage} kWh</strong>
                     </div>`;
             });
-            
             analysisResults.innerHTML = detailHtml;
-            analyzeBtn.disabled = false;
-            analyzeBtn.textContent = '사진 분석 시작';
-            applyBtn.style.display = 'block'; 
-        });
+        };
 
         applyBtn.addEventListener('click', () => {
             if (pendingData.length === 0) return;
@@ -389,6 +445,7 @@
             alert(`${pendingData.length}건의 데이터가 차트와 목록에 반영되었습니다.`);
             applyBtn.disabled = true;
             applyBtn.textContent = '반영 완료';
+            saveState();
         });
 
         resetBtn.addEventListener('click', () => {
@@ -399,50 +456,58 @@
             applyBtn.disabled = false;
             applyBtn.textContent = '데이터 반영하기';
             resetBtn.style.display = 'none';
+            saveState();
         });
         
         uploadResetBtn.addEventListener('click', () => {
             if (!confirm('업로드된 사진 목록을 초기화하시겠습니까?')) return;
-            uploadedFiles = [];
+            uploadedFilesData = [];
             photoInput.value = '';
             renderThumbnails();
             uploadResetBtn.style.display = 'none';
+            saveState();
         });
 
-        // --- 3. UI 렌더링 및 필터 로직 ---
+        // --- 4. UI 렌더링 및 필터 로직 ---
         const updateMonthlyFilter = (filter) => {
             monthlyFilter = filter;
-            document.getElementById('filter-monthly-13').classList.toggle('active', filter === '13months');
-            document.getElementById('filter-monthly-year').classList.toggle('active', filter === 'thisyear');
-            document.getElementById('filter-monthly-last').classList.toggle('active', filter === 'lastyear');
-            document.getElementById('filter-monthly-24').classList.toggle('active', filter === '2years');
+            saveState();
             renderMonthlyChart();
         };
 
         const updateDailyFilter = (filter) => {
             dailyFilter = filter;
-            document.getElementById('filter-daily-40').classList.toggle('active', filter === '40days');
-            document.getElementById('filter-daily-month').classList.toggle('active', filter === 'thismonth');
-            document.getElementById('filter-daily-last').classList.toggle('active', filter === 'lastmonth');
-            document.getElementById('filter-daily-year').classList.toggle('active', filter === 'thisyear');
+            saveState();
             renderDailyChart();
         };
 
         const switchTab = (tab) => {
             currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', 
-                    (tab === 'daily' && btn.id === 'tab-daily') || 
-                    (tab === 'monthly' && btn.id === 'tab-monthly')
-                );
-            });
-            document.getElementById('list-header').innerHTML = 
-                tab === 'daily' ? '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>' : '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>';
-            
+            saveState();
             renderUsageList();
         };
 
         const updateUI = () => {
+            // 버튼 상태 동기화
+            document.getElementById('filter-monthly-13').classList.toggle('active', monthlyFilter === '13months');
+            document.getElementById('filter-monthly-year').classList.toggle('active', monthlyFilter === 'thisyear');
+            document.getElementById('filter-monthly-last').classList.toggle('active', monthlyFilter === 'lastyear');
+            document.getElementById('filter-monthly-24').classList.toggle('active', monthlyFilter === '2years');
+            
+            document.getElementById('filter-daily-40').classList.toggle('active', dailyFilter === '40days');
+            document.getElementById('filter-daily-month').classList.toggle('active', dailyFilter === 'thismonth');
+            document.getElementById('filter-daily-last').classList.toggle('active', dailyFilter === 'lastmonth');
+            document.getElementById('filter-daily-year').classList.toggle('active', dailyFilter === 'thisyear');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (currentTab === 'daily' && btn.id === 'tab-daily') || 
+                    (currentTab === 'monthly' && btn.id === 'tab-monthly')
+                );
+            });
+            document.getElementById('list-header').innerHTML = 
+                currentTab === 'daily' ? '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>' : '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>';
+
             renderDailyChart();
             renderMonthlyChart();
             renderUsageList();
@@ -602,7 +667,13 @@
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
-            const monthlyMap = getMonthlyData();
+            
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7);
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
             const lastYear = "2025";
@@ -723,7 +794,14 @@
             }
         };
 
-        updateUI();
+        // 초기화 시 상태 로드
+        window.addEventListener('load', () => {
+            loadState();
+            if (!sessionStorage.getItem('energyTrackerState')) {
+                updateUI();
+            }
+        });
+        
         setupDragScroll('daily-chart');
         setupDragScroll('monthly-chart');
     </script>
