@@ -40,9 +40,10 @@
         h1 { color: var(--primary-blue); text-align: center; margin-bottom: 30px; }
         h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 다크모드 버튼 */
+        /* 다크모드 버튼 (텍스트 없이 아이콘만) */
         .theme-toggle-container { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 100; }
-        .theme-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 15px; font-size: 12px; cursor: pointer; color: var(--text-color); }
+        .theme-btn { background: var(--card-bg); border: 1px solid var(--border-color); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 16px; cursor: pointer; color: var(--text-color); transition: all 0.2s; padding: 0; }
+        .theme-btn:hover { background-color: var(--border-color); }
 
         /* 제목 우측 요약 정보 */
         .title-summary { font-size: 11px; font-weight: normal; text-align: right; line-height: 1.3; color: var(--secondary-text); }
@@ -115,10 +116,10 @@
         .variation.same { color: var(--secondary-text); opacity: 0.5; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
     <div class="theme-toggle-container">
         <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2115-kst</span>
-        <button class="theme-btn" onclick="toggleTheme()">🌙 다크모드</button>
+        <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">☀️</button>
     </div>
     
     <div style="background-color: var(--warn-bg); color: var(--warn-text); padding: 10px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; margin-top: 25px; border-radius: 8px;">
@@ -211,9 +212,9 @@
             const btn = document.querySelector('.theme-btn');
             body.classList.toggle('dark-mode');
             if (body.classList.contains('dark-mode')) {
-                btn.textContent = '☀️ 라이트모드';
+                btn.textContent = '☀️';
             } else {
-                btn.textContent = '🌙 다크모드';
+                btn.textContent = '🌙';
             }
         }
 
