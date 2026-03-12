@@ -43,10 +43,9 @@
         .chart-container::-webkit-scrollbar { display: none; }
         .chart-container { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 그리드 라인 (막대보다 앞에 오도록 설정) */
+        /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(238, 238, 238, 0.8); z-index: 2; pointer-events: none; }
 
-        /* 막대 폭을 32px로 확장 */
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 32px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
         
@@ -83,10 +82,7 @@
         <h3>1. 월패드 사진 업로드</h3>
         <p style="font-size: 14px; color: #5f6368;">분석할 사진을 여러 장 선택할 수 있습니다.</p>
         <input type="file" id="photo-input" accept="image/*" multiple>
-        
-        <!-- 썸네일 미리보기 영역 -->
         <div id="thumbnail-preview" class="thumbnail-container"></div>
-        
         <button id="analyze-btn">사진 분석 시작</button>
     </div>
 
@@ -101,7 +97,7 @@
 
     <!-- 2. 월별 사용량 차트 -->
     <div class="card">
-        <h3>월별 사용량 (최근 4개월)</h3>
+        <h3>월별 사용량 (최근 13개월)</h3>
         <div class="chart-wrapper">
             <div id="monthly-y-axis" class="y-axis"></div>
             <div id="monthly-chart" class="chart-container monthly"></div>
@@ -140,20 +136,36 @@
     <script>
         // --- 1. 데이터 생성 및 관리 ---
         
-        const FIXED_DATA = [
-            { "date": "2025-12-02", "usage": 9.2 }, { "date": "2025-12-03", "usage": 8.1 }, { "date": "2025-12-04", "usage": 7.5 }, { "date": "2025-12-05", "usage": 10.4 }, { "date": "2025-12-06", "usage": 11.8 }, { "date": "2025-12-07", "usage": 6.7 }, { "date": "2025-12-08", "usage": 8.3 }, { "date": "2025-12-09", "usage": 9.5 }, { "date": "2025-12-10", "usage": 7.1 }, { "date": "2025-12-11", "usage": 8.8 },
-            { "date": "2025-12-12", "usage": 10.2 }, { "date": "2025-12-13", "usage": 12.5 }, { "date": "2025-12-14", "usage": 9.1 }, { "date": "2025-12-15", "usage": 7.4 }, { "date": "2025-12-16", "usage": 6.9 }, { "date": "2025-12-17", "usage": 8.6 }, { "date": "2025-12-18", "usage": 11.3 }, { "date": "2025-12-19", "usage": 10.1 }, { "date": "2025-12-20", "usage": 7.7 }, { "date": "2025-12-21", "usage": 5.8 },
-            { "date": "2025-12-22", "usage": 9.4 }, { "date": "2025-12-23", "usage": 8.7 }, { "date": "2025-12-24", "usage": 12.2 }, { "date": "2025-12-25", "usage": 13.5 }, { "date": "2025-12-26", "usage": 11.1 }, { "date": "2025-12-27", "usage": 8.9 }, { "date": "2025-12-28", "usage": 10.4 }, { "date": "2025-12-29", "usage": 7.3 }, { "date": "2025-12-30", "usage": 9.6 }, { "date": "2025-12-31", "usage": 11.2 },
-            { "date": "2026-01-01", "usage": 8.5 }, { "date": "2026-01-02", "usage": 7.2 }, { "date": "2026-01-03", "usage": 9.8 }, { "date": "2026-01-04", "usage": 10.5 }, { "date": "2026-01-05", "usage": 6.4 }, { "date": "2026-01-06", "usage": 8.1 }, { "date": "2026-01-07", "usage": 9.3 }, { "date": "2026-01-08", "usage": 7.7 }, { "date": "2026-01-09", "usage": 11.4 }, { "date": "2026-01-10", "usage": 12.8 },
-            { "date": "2026-01-11", "usage": 9.1 }, { "date": "2026-01-12", "usage": 8.3 }, { "date": "2026-01-13", "usage": 10.6 }, { "date": "2026-01-14", "usage": 7.5 }, { "date": "2026-01-15", "usage": 6.8 }, { "date": "2026-01-16", "usage": 9.2 }, { "date": "2026-01-17", "usage": 11.7 }, { "date": "2026-01-18", "usage": 8.4 }, { "date": "2026-01-19", "usage": 7.9 }, { "date": "2026-01-20", "usage": 10.1 },
-            { "date": "2026-01-21", "usage": 11.5 }, { "date": "2026-01-22", "usage": 9.3 }, { "date": "2026-01-23", "usage": 8.7 }, { "date": "2026-01-24", "usage": 12.1 }, { "date": "2026-01-25", "usage": 10.8 }, { "date": "2026-01-26", "usage": 7.6 }, { "date": "2026-01-27", "usage": 6.5 }, { "date": "2026-01-28", "usage": 9.4 }, { "date": "2026-01-29", "usage": 8.2 }, { "date": "2026-01-30", "usage": 11.1 },
-            { "date": "2026-01-31", "usage": 10.3 }, { "date": "2026-02-01", "usage": 8.2 }, { "date": "2026-02-02", "usage": 7.5 }, { "date": "2026-02-03", "usage": 9.1 }, { "date": "2026-02-04", "usage": 6.8 }, { "date": "2026-02-05", "usage": 10.4 }, { "date": "2026-02-06", "usage": 5.9 }, { "date": "2026-02-07", "usage": 8.7 }, { "date": "2026-02-08", "usage": 11.2 }, { "date": "2026-02-09", "usage": 7.3 },
-            { "date": "2026-02-10", "usage": 6.5 }, { "date": "2026-02-11", "usage": 9.8 }, { "date": "2026-02-12", "usage": 8.1 }, { "date": "2026-02-13", "usage": 10.6 }, { "date": "2026-02-14", "usage": 12.1 }, { "date": "2026-02-15", "usage": 7.8 }, { "date": "2026-02-16", "usage": 6.2 }, { "date": "2026-02-17", "usage": 9.4 }, { "date": "2026-02-18", "usage": 8.5 }, { "date": "2026-02-19", "usage": 11.7 },
-            { "date": "2026-02-20", "usage": 10.1 }, { "date": "2026-02-21", "usage": 5.4 }, { "date": "2026-02-22", "usage": 8.9 }, { "date": "2026-02-23", "usage": 7.6 }, { "date": "2026-02-24", "usage": 9.2 }, { "date": "2026-02-25", "usage": 6.7 }, { "date": "2026-02-26", "usage": 11.3 }, { "date": "2026-02-27", "usage": 8.4 }, { "date": "2026-02-28", "usage": 10.8 }, { "date": "2026-03-01", "usage": 7.9 },
-            { "date": "2026-03-02", "usage": 6.1 }, { "date": "2026-03-03", "usage": 9.7 }, { "date": "2026-03-04", "usage": 8.3 }, { "date": "2026-03-05", "usage": 11.5 }, { "date": "2026-03-06", "usage": 7.1 }, { "date": "2026-03-07", "usage": 5.8 }, { "date": "2026-03-08", "usage": 10.2 }, { "date": "2026-03-09", "usage": 8.6 }, { "date": "2026-03-10", "usage": 6.4 }, { "date": "2026-03-11", "usage": 9.5 },
-            { "date": "2026-03-12", "usage": 7.7 }
-        ];
+        // 13개월치 (약 400일) 고정 샘플 데이터 생성 함수
+        const generate13MonthsData = () => {
+            const data = [];
+            const endDate = new Date("2026-03-12");
+            const startDate = new Date("2025-02-01");
+            
+            // 패턴을 위한 의사 난수 생성기 (seed 기반)
+            let seed = 12345;
+            const pseudoRandom = () => {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
 
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                // 월별 계절 패턴 반영 (여름/겨울에 사용량 증가)
+                const month = d.getMonth();
+                let seasonalBoost = 0;
+                if (month === 6 || month === 7) seasonalBoost = 5; // 여름 (7, 8월)
+                if (month === 11 || month === 0) seasonalBoost = 4; // 겨울 (12, 1월)
+                
+                const usage = parseFloat((pseudoRandom() * 6 + 4 + seasonalBoost).toFixed(1));
+                data.push({
+                    date: d.toISOString().split('T')[0],
+                    usage: usage
+                });
+            }
+            return data;
+        };
+
+        const FIXED_DATA = generate13MonthsData();
         let currentData = [...FIXED_DATA];
         let pendingData = []; 
         let currentTab = 'monthly';
@@ -188,7 +200,6 @@
 
                     for (let i = 0; i < files.length; i++) {
                         let dataCount = (i === 0) ? 3 : (i === 1 ? 2 : 1);
-                        
                         for (let j = 0; j < dataCount; j++) {
                             const date = new Date(baseDate);
                             date.setDate(baseDate.getDate() + dayOffset++);
@@ -409,6 +420,8 @@
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
+            
+            setTimeout(() => { container.scrollLeft = container.scrollWidth; }, 100);
         };
 
         const getMonthlyData = () => {
@@ -442,6 +455,7 @@
             }
         };
 
+        // 초기 실행
         updateUI();
         setupDragScroll('daily-chart');
         setupDragScroll('monthly-chart');
