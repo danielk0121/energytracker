@@ -38,5 +38,12 @@
 - 클라이언트 사이드에서 JavaScript만으로 동작하는 OCR(Tesseract.js 등) 기술 활용을 권장합니다.
 - 정교한 분석을 위해 LLM AI 서비스가 필요할 경우 도입을 검토하되, 이 경우 API 키 보안을 위해 백엔드 서버 구축이 병행되어야 합니다.
 
+## 스크린샷
+
+![img0.png](docs/app_screenshot/img0.png)
+![img1.png](docs/app_screenshot/img1.png)
+![img2.png](docs/app_screenshot/img2.png)
+
 ---
+
 *현재 Phase 1: 웹 프로토타입 단계가 진행 중입니다.*
