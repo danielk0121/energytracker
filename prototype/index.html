@@ -116,11 +116,10 @@
             <span>월별 사용량</span>
             <div id="monthly-summary" class="title-summary"></div>
         </h3>
-        <!-- 기간 필터 추가 -->
         <div class="filter-group">
-            <button class="filter-btn active" onclick="updateMonthlyFilter('13months')">최근 13개월</button>
-            <button class="filter-btn" onclick="updateMonthlyFilter('thisyear')">이번 연도</button>
-            <button class="filter-btn" onclick="updateMonthlyFilter('2years')">최근 2년</button>
+            <button id="filter-monthly-13" class="filter-btn active" onclick="updateMonthlyFilter('13months')">최근 13개월</button>
+            <button id="filter-monthly-year" class="filter-btn" onclick="updateMonthlyFilter('thisyear')">이번 연도</button>
+            <button id="filter-monthly-24" class="filter-btn" onclick="updateMonthlyFilter('2years')">최근 2년</button>
         </div>
         <div id="monthly-wrapper" class="chart-wrapper">
             <div id="monthly-y-axis" class="y-axis"></div>
@@ -131,9 +130,15 @@
     <!-- 3. 일자별 사용량 차트 -->
     <div class="card">
         <h3>
-            <span>일자별 사용량 (최근 30일)</span>
+            <span>일자별 사용량</span>
             <div id="daily-summary" class="title-summary"></div>
         </h3>
+        <!-- 일자별 필터 추가 -->
+        <div class="filter-group">
+            <button id="filter-daily-40" class="filter-btn active" onclick="updateDailyFilter('40days')">최근 40일</button>
+            <button id="filter-daily-month" class="filter-btn" onclick="updateDailyFilter('thismonth')">이번 달</button>
+            <button id="filter-daily-year" class="filter-btn" onclick="updateDailyFilter('thisyear')">이번 연도</button>
+        </div>
         <div id="daily-wrapper" class="chart-wrapper">
             <div id="daily-y-axis" class="y-axis"></div>
             <div id="daily-chart" class="chart-container"></div>
@@ -166,7 +171,7 @@
         const generate13MonthsData = () => {
             const data = [];
             const endDate = new Date("2026-03-12");
-            const startDate = new Date("2025-01-01"); // 최근 2년 필터를 위해 2025년부터 시작
+            const startDate = new Date("2025-01-01"); 
             let seed = 12345;
             const pseudoRandom = () => {
                 seed = (seed * 9301 + 49297) % 233280;
@@ -192,6 +197,7 @@
         let pendingData = []; 
         let currentTab = 'monthly';
         let monthlyFilter = '13months';
+        let dailyFilter = '40days';
 
         // --- 2. 사진 업로드 및 분석 로직 ---
 
@@ -295,10 +301,22 @@
 
         const updateMonthlyFilter = (filter) => {
             monthlyFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.onclick.toString().includes(filter));
+            document.querySelectorAll('[id^="filter-monthly-"]').forEach(btn => {
+                btn.classList.toggle('active', btn.id.includes(filter.replace('months','').replace('year','year').replace('2years','24')));
             });
+            // 정확한 ID 매칭을 위해 간단한 로직 수정
+            document.getElementById('filter-monthly-13').classList.toggle('active', filter === '13months');
+            document.getElementById('filter-monthly-year').classList.toggle('active', filter === 'thisyear');
+            document.getElementById('filter-monthly-24').classList.toggle('active', filter === '2years');
             renderMonthlyChart();
+        };
+
+        const updateDailyFilter = (filter) => {
+            dailyFilter = filter;
+            document.getElementById('filter-daily-40').classList.toggle('active', filter === '40days');
+            document.getElementById('filter-daily-month').classList.toggle('active', filter === 'thismonth');
+            document.getElementById('filter-daily-year').classList.toggle('active', filter === 'thisyear');
+            renderDailyChart();
         };
 
         const switchTab = (tab) => {
@@ -380,13 +398,31 @@
         const renderDailyChart = () => {
             const container = document.getElementById('daily-chart');
             const summaryContainer = document.getElementById('daily-summary');
-            const recent30 = currentData.slice(-30);
-            const usages = recent30.map(d => d.usage);
+            
+            let filteredData = [...currentData];
+            const currentYear = "2026";
+            const currentMonth = "2026-03";
+
+            if (dailyFilter === '40days') {
+                filteredData = filteredData.slice(-40);
+            } else if (dailyFilter === 'thismonth') {
+                filteredData = filteredData.filter(d => d.date.startsWith(currentMonth));
+            } else if (dailyFilter === 'thisyear') {
+                filteredData = filteredData.filter(d => d.date.startsWith(currentYear));
+            }
+
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="analysis-empty">해당 기간의 데이터가 없습니다.</div>';
+                summaryContainer.innerHTML = '';
+                return;
+            }
+
+            const usages = filteredData.map(d => d.usage);
             const maxUsage = Math.max(...usages);
             const minUsage = Math.min(...usages);
             
-            const maxDay = recent30.find(d => d.usage === maxUsage).date;
-            const minDay = recent30.find(d => d.usage === minUsage).date;
+            const maxDay = filteredData.find(d => d.usage === maxUsage).date;
+            const minDay = filteredData.find(d => d.usage === minUsage).date;
 
             summaryContainer.innerHTML = `
                 <div>최대: <span class="summary-max">${maxUsage.toFixed(1)} kWh</span> (${maxDay})</div>
@@ -397,7 +433,7 @@
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
             let lastYear = null;
-            recent30.forEach((item, index) => {
+            filteredData.forEach((item, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
                 if (item.usage === maxUsage) bar.classList.add('max');
@@ -432,7 +468,6 @@
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
             
-            // 데이터 집계
             const monthlyMap = {};
             currentData.forEach(item => {
                 const month = item.date.substring(0, 7);
@@ -442,7 +477,6 @@
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
 
-            // 필터링 적용
             if (monthlyFilter === '13months') {
                 months = months.slice(-13);
             } else if (monthlyFilter === 'thisyear') {
