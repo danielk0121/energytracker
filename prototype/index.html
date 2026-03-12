@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0150-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0155-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -235,7 +235,7 @@
         <table class="data-list">
             <thead>
                 <tr id="list-header">
-                    <th>월</th>
+                    <th>날짜</th>
                     <th>사용량 (kWh)</th>
                     <th>등락</th>
                 </tr>
@@ -416,7 +416,7 @@
                 );
             });
             document.getElementById('list-header').innerHTML = 
-                tab === 'daily' ? '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>' : '<th>월</th><th>사용량 (kWh)</th><th>등락</th>';
+                tab === 'daily' ? '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>' : '<th>날짜</th><th>사용량 (kWh)</th><th>등락</th>';
             
             renderUsageList();
         };
