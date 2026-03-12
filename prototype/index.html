@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0155-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0205-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -573,12 +573,7 @@
                 const label = document.createElement('div');
                 label.className = 'bar-label';
                 const [y, m, d] = item.date.split('-');
-                let labelHtml = `${m}/${d}`;
-                if (index === 0 || y !== lastYear) {
-                    labelHtml += `<br>${y}`;
-                    lastYear = y;
-                }
-                label.innerHTML = labelHtml;
+                label.innerHTML = `${m}/${d}<br>${y}`;
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
