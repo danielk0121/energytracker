@@ -35,7 +35,7 @@
             --warn-text: #fbcc33;
         }
 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6; color: var(--text-color); background-color: var(--bg-color); transition: background-color 0.3s, color 0.3s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: var(--text-color); background-color: var(--bg-color); transition: background-color 0.3s, color 0.3s; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: background-color 0.3s; position: relative; }
         h1 { color: var(--primary-blue); text-align: center; margin-bottom: 30px; }
         h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
@@ -83,7 +83,7 @@
 
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: var(--chart-bg); border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; overflow: hidden; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid var(--border-color); font-size: 10px; color: var(--secondary-text); text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
         .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; z-index: 5; }
         .chart-container:active { cursor: grabbing; }
         .chart-container::-webkit-scrollbar { display: none; }
@@ -105,10 +105,13 @@
 
         /* 데이터 목록 */
         .data-list { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .data-list th, .data-list td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .data-list th, .data-list td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
         .data-list th { background-color: var(--chart-bg); font-weight: 600; color: var(--secondary-text); }
         .data-list tr:hover { background-color: var(--border-color); }
         .usage-val { font-weight: bold; color: var(--primary-blue); }
+        
+        /* 날짜 컬럼 너비 확보 및 줄바꿈 방지 */
+        .date-col { white-space: nowrap; font-size: 13px; min-width: 90px; }
         
         /* 변동폭 스타일 */
         .variation { font-size: 11px; font-weight: bold; }
@@ -119,7 +122,7 @@
 </head>
 <body class="dark-mode">
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2115-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2130-kst</span>
         <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">☀️</button>
     </div>
     
@@ -604,7 +607,7 @@
                     
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${item.date}</td>
+                        <td class="date-col">${item.date}</td>
                         <td><span class="usage-val">${item.usage.toFixed(1)}</span></td>
                         <td>${variationHtml}</td>
                     `;
@@ -623,7 +626,7 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${month}</td>
+                        <td class="date-col">${month}</td>
                         <td><span class="usage-val">${monthlyMap[month].toFixed(1)}</span></td>
                         <td>${variationHtml}</td>
                     `;
