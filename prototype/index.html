@@ -133,7 +133,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0235-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1015-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -472,13 +472,13 @@
         const updateMonthlyFilter = (filter) => {
             monthlyFilter = filter;
             saveState();
-            renderMonthlyChart();
+            updateUI();
         };
 
         const updateDailyFilter = (filter) => {
             dailyFilter = filter;
             saveState();
-            renderDailyChart();
+            updateUI();
         };
 
         const switchTab = (tab) => {
