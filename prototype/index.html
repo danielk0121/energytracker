@@ -37,7 +37,7 @@
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: var(--text-color); background-color: var(--bg-color); transition: background-color 0.3s, color 0.3s; }
         .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: background-color 0.3s; position: relative; }
-        h1 { color: var(--primary-blue); text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary-blue); text-align: center; margin-bottom: 10px; }
         h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
         /* 다크모드 버튼 (텍스트 없이 아이콘만) */
@@ -119,16 +119,17 @@
         .variation.same { color: var(--secondary-text); opacity: 0.5; }
     </style>
 </head>
-<body class="dark-mode">
+<body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2150-kst</span>
-        <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">☀️</button>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260312-2200-kst</span>
+        <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
     </div>
     
-    <div style="background-color: var(--warn-bg); color: var(--warn-text); padding: 10px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; margin-top: 25px; border-radius: 8px;">
+    <h1>EnergyTracker</h1>
+
+    <div style="background-color: var(--warn-bg); color: var(--warn-text); padding: 10px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; border-radius: 8px;">
         현재 샘플 데이터를 사용 중입니다.
     </div>
-    <h1>EnergyTracker</h1>
 
     <!-- 1. 사진 업로드 섹션 -->
     <div class="card upload-section">
