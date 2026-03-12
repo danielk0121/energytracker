@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EnergyTracker Prototype</title>
+    <title>에너지트래커</title>
     <style>
         :root {
             --bg-color: #f0f2f5;
@@ -72,6 +72,9 @@
         .btn-apply:hover { background-color: #2d8e47; }
         .btn-reset { background-color: var(--secondary-text); flex: 1; display: none; }
         .btn-reset:hover { background-color: #494c50; }
+        
+        .upload-btn-reset { background-color: var(--secondary-text); flex: 1; display: none; }
+        .upload-btn-reset:hover { background-color: #494c50; }
 
         /* 분석 결과 섹션 */
         #analysis-results { min-height: 50px; background: var(--chart-bg); border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid var(--border-color); }
@@ -128,7 +131,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0210-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0220-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -145,7 +148,10 @@
         <p style="font-size: 14px; color: var(--secondary-text);">분석할 사진을 여러 장 선택할 수 있습니다.</p>
         <input type="file" id="photo-input" accept="image/*" multiple>
         <div id="thumbnail-preview" class="thumbnail-container"></div>
-        <button id="analyze-btn">사진 분석 시작</button>
+        <div class="btn-group">
+            <button id="analyze-btn">사진 분석 시작</button>
+            <button id="upload-reset-btn" class="upload-btn-reset">초기화</button>
+        </div>
     </div>
 
     <!-- 사진 분석 결과 섹션 -->
@@ -290,28 +296,37 @@
         let currentTab = 'monthly';
         let monthlyFilter = '13months';
         let dailyFilter = '40days';
+        
+        let uploadedFiles = []; // 업로드된 파일들을 누적으로 관리
 
         // --- 2. 사진 업로드 및 분석 로직 ---
         const photoInput = document.getElementById('photo-input');
         const thumbnailPreview = document.getElementById('thumbnail-preview');
         const analyzeBtn = document.getElementById('analyze-btn');
+        const uploadResetBtn = document.getElementById('upload-reset-btn');
         const applyBtn = document.getElementById('apply-btn');
         const resetBtn = document.getElementById('reset-btn');
         const analysisResults = document.getElementById('analysis-results');
 
         photoInput.addEventListener('change', (e) => {
-            thumbnailPreview.innerHTML = '';
             if (e.target.files && e.target.files.length > 0) {
-                Array.from(e.target.files).forEach(file => {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(file);
-                    img.className = 'thumbnail';
-                    img.onload = () => URL.revokeObjectURL(img.src);
-                    thumbnailPreview.appendChild(img);
-                });
-                resetBtn.style.display = 'block';
+                const newFiles = Array.from(e.target.files);
+                uploadedFiles = [...uploadedFiles, ...newFiles];
+                renderThumbnails();
+                uploadResetBtn.style.display = 'block';
             }
         });
+        
+        const renderThumbnails = () => {
+            thumbnailPreview.innerHTML = '';
+            uploadedFiles.forEach(file => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'thumbnail';
+                img.onload = () => URL.revokeObjectURL(img.src);
+                thumbnailPreview.appendChild(img);
+            });
+        };
 
         const mockAnalyzeImage = (files) => {
             return new Promise((resolve) => {
@@ -338,7 +353,7 @@
         };
 
         analyzeBtn.addEventListener('click', async () => {
-            if (!photoInput.files || photoInput.files.length === 0) {
+            if (uploadedFiles.length === 0) {
                 alert('분석할 사진을 먼저 선택해주세요.');
                 return;
             }
@@ -348,9 +363,9 @@
             analyzeBtn.textContent = '이미지 분석 중...';
             applyBtn.style.display = 'none';
             resetBtn.style.display = 'block';
-            analysisResults.innerHTML = `<div class="analysis-empty"><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
+            analysisResults.innerHTML = `<div class="analysis-empty"><strong>${uploadedFiles.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
-            pendingData = await mockAnalyzeImage(photoInput.files);
+            pendingData = await mockAnalyzeImage(uploadedFiles);
             
             let detailHtml = `<p style="color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${pendingData.length}건)</p>`;
             pendingData.forEach((data) => {
@@ -377,15 +392,21 @@
         });
 
         resetBtn.addEventListener('click', () => {
-            if (!confirm('업로드된 사진과 분석 결과를 초기화하시겠습니까?')) return;
-            photoInput.value = '';
-            thumbnailPreview.innerHTML = '';
+            if (!confirm('분석 결과를 초기화하시겠습니까?')) return;
             analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다.<br>분석을 시작해주세요.</div>`;
             pendingData = [];
             applyBtn.style.display = 'none';
             applyBtn.disabled = false;
             applyBtn.textContent = '데이터 반영하기';
             resetBtn.style.display = 'none';
+        });
+        
+        uploadResetBtn.addEventListener('click', () => {
+            if (!confirm('업로드된 사진 목록을 초기화하시겠습니까?')) return;
+            uploadedFiles = [];
+            photoInput.value = '';
+            renderThumbnails();
+            uploadResetBtn.style.display = 'none';
         });
 
         // --- 3. UI 렌더링 및 필터 로직 ---
@@ -554,7 +575,6 @@
             const maxVal = drawYAxisAndGrid('daily-wrapper', 'daily-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
-            let lastYear = null;
             filteredData.forEach((item, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
@@ -582,13 +602,7 @@
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
-            
-            const monthlyMap = {};
-            currentData.forEach(item => {
-                const month = item.date.substring(0, 7);
-                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
-            });
-
+            const monthlyMap = getMonthlyData();
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
             const lastYear = "2025";
@@ -648,6 +662,15 @@
             });
         };
 
+        const getMonthlyData = () => {
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7);
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+            return monthlyMap;
+        };
+
         const renderUsageList = () => {
             const tbody = document.getElementById('usage-list-body');
             tbody.innerHTML = '';
@@ -665,7 +688,7 @@
                     }
                     
                     const dateObj = new Date(item.date);
-                    const dayOfWeek = dateObj.getDay(); // 0: 일, 6: 토
+                    const dayOfWeek = dateObj.getDay(); 
                     const dayName = weekDays[dayOfWeek];
                     const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
                     const dateStyle = isWeekend ? 'color: var(--up-color);' : '';
@@ -679,11 +702,7 @@
                     tbody.prepend(tr); 
                 });
             } else {
-                const monthlyMap = {};
-                currentData.forEach(item => {
-                    const month = item.date.substring(0, 7);
-                    monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
-                });
+                const monthlyMap = getMonthlyData();
                 const sortedMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
                 sortedMonths.forEach((month, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
