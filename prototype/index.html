@@ -234,7 +234,8 @@
             const maxVal = drawYAxisAndGrid('daily-chart', 'daily-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
-            recent30.forEach(item => {
+            let lastYear = null;
+            recent30.forEach((item, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
                 const height = (item.usage / maxVal) * 200;
@@ -244,8 +245,15 @@
                 const label = document.createElement('div');
                 label.className = 'bar-label';
                 const [y, m, d] = item.date.split('-');
-                label.innerHTML = `${m}-${d}<br>${y}`;
                 
+                let labelHtml = `${m}/${d}`;
+                // 차트의 첫 번째 바 또는 연도가 바뀌는 구간에만 연도 표시
+                if (index === 0 || y !== lastYear) {
+                    labelHtml += `<br>${y}`;
+                    lastYear = y;
+                }
+                
+                label.innerHTML = labelHtml;
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
@@ -260,7 +268,8 @@
             const maxVal = drawYAxisAndGrid('monthly-chart', 'monthly-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
-            months.forEach(month => {
+            let lastYear = null;
+            months.forEach((month, index) => {
                 const usage = monthlyMap[month];
                 const bar = document.createElement('div');
                 bar.className = 'bar';
@@ -271,8 +280,14 @@
                 const label = document.createElement('div');
                 label.className = 'bar-label';
                 const [y, m] = month.split('-');
-                label.innerHTML = `${m}월<br>${y}`;
                 
+                let labelHtml = `${m}월`;
+                if (index === 0 || y !== lastYear) {
+                    labelHtml += `<br>${y}`;
+                    lastYear = y;
+                }
+                
+                label.innerHTML = labelHtml;
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
