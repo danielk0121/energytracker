@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0110-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0100-kst</span>
         <button class="theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
     </div>
     
@@ -564,12 +564,11 @@
                 bar.style.height = `${height}px`;
                 bar.title = `${item.date}: ${item.usage}kWh`;
                 
-                if (item.usage === maxUsage || item.usage === minUsage) {
-                    const valLabel = document.createElement('div');
-                    valLabel.className = 'value-label';
-                    valLabel.innerHTML = `<span>${item.usage}</span>`;
-                    bar.appendChild(valLabel);
-                }
+                // 모든 막대에 수치 라벨 추가
+                const valLabel = document.createElement('div');
+                valLabel.className = 'value-label';
+                valLabel.innerHTML = `<span>${item.usage}</span>`;
+                bar.appendChild(valLabel);
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
@@ -588,7 +587,13 @@
         const renderMonthlyChart = () => {
             const container = document.getElementById('monthly-chart');
             const summaryContainer = document.getElementById('monthly-summary');
-            const monthlyMap = getMonthlyData();
+            
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7);
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
             const lastYear = "2025";
@@ -634,12 +639,11 @@
                 bar.style.height = `${height}px`;
                 bar.title = `${month}: ${usage.toFixed(1)}kWh`;
 
-                if (usage === maxUsage || usage === minUsage) {
-                    const valLabel = document.createElement('div');
-                    valLabel.className = 'value-label';
-                    valLabel.innerHTML = `<span>${usage.toFixed(1)}</span>`;
-                    bar.appendChild(valLabel);
-                }
+                // 모든 막대에 수치 라벨 추가
+                const valLabel = document.createElement('div');
+                valLabel.className = 'value-label';
+                valLabel.innerHTML = `<span>${usage.toFixed(1)}</span>`;
+                bar.appendChild(valLabel);
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
@@ -648,15 +652,6 @@
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
-        };
-
-        const getMonthlyData = () => {
-            const monthlyMap = {};
-            currentData.forEach(item => {
-                const month = item.date.substring(0, 7);
-                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
-            });
-            return monthlyMap;
         };
 
         const renderUsageList = () => {
@@ -682,7 +677,11 @@
                     tbody.prepend(tr); 
                 });
             } else {
-                const monthlyMap = getMonthlyData();
+                const monthlyMap = {};
+                currentData.forEach(item => {
+                    const month = item.date.substring(0, 7);
+                    monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+                });
                 const sortedMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
                 sortedMonths.forEach((month, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
