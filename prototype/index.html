@@ -16,7 +16,7 @@
         .summary-min { color: #34a853; font-weight: bold; }
 
         /* 필터 버튼 그룹 */
-        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .filter-btn { background-color: #f1f3f4; border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; color: #5f6368; transition: all 0.2s; width: auto; }
         .filter-btn.active { background-color: #1a73e8; color: white; }
 
@@ -133,10 +133,10 @@
             <span>일자별 사용량</span>
             <div id="daily-summary" class="title-summary"></div>
         </h3>
-        <!-- 일자별 필터 추가 -->
         <div class="filter-group">
             <button id="filter-daily-40" class="filter-btn active" onclick="updateDailyFilter('40days')">최근 40일</button>
             <button id="filter-daily-month" class="filter-btn" onclick="updateDailyFilter('thismonth')">이번 달</button>
+            <button id="filter-daily-last" class="filter-btn" onclick="updateDailyFilter('lastmonth')">저번 달</button>
             <button id="filter-daily-year" class="filter-btn" onclick="updateDailyFilter('thisyear')">이번 연도</button>
         </div>
         <div id="daily-wrapper" class="chart-wrapper">
@@ -301,10 +301,6 @@
 
         const updateMonthlyFilter = (filter) => {
             monthlyFilter = filter;
-            document.querySelectorAll('[id^="filter-monthly-"]').forEach(btn => {
-                btn.classList.toggle('active', btn.id.includes(filter.replace('months','').replace('year','year').replace('2years','24')));
-            });
-            // 정확한 ID 매칭을 위해 간단한 로직 수정
             document.getElementById('filter-monthly-13').classList.toggle('active', filter === '13months');
             document.getElementById('filter-monthly-year').classList.toggle('active', filter === 'thisyear');
             document.getElementById('filter-monthly-24').classList.toggle('active', filter === '2years');
@@ -315,6 +311,7 @@
             dailyFilter = filter;
             document.getElementById('filter-daily-40').classList.toggle('active', filter === '40days');
             document.getElementById('filter-daily-month').classList.toggle('active', filter === 'thismonth');
+            document.getElementById('filter-daily-last').classList.toggle('active', filter === 'lastmonth');
             document.getElementById('filter-daily-year').classList.toggle('active', filter === 'thisyear');
             renderDailyChart();
         };
@@ -402,11 +399,14 @@
             let filteredData = [...currentData];
             const currentYear = "2026";
             const currentMonth = "2026-03";
+            const lastMonth = "2026-02";
 
             if (dailyFilter === '40days') {
                 filteredData = filteredData.slice(-40);
             } else if (dailyFilter === 'thismonth') {
                 filteredData = filteredData.filter(d => d.date.startsWith(currentMonth));
+            } else if (dailyFilter === 'lastmonth') {
+                filteredData = filteredData.filter(d => d.date.startsWith(lastMonth));
             } else if (dailyFilter === 'thisyear') {
                 filteredData = filteredData.filter(d => d.date.startsWith(currentYear));
             }
