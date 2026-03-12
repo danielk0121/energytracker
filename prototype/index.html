@@ -31,13 +31,17 @@
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
         .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; }
-        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 8px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; }
+        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 8px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; }
+        .chart-container:active { cursor: grabbing; }
+        
+        /* 스크롤바 숨기기 */
+        .chart-container::-webkit-scrollbar { display: none; }
+        .chart-container { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
 
-        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; }
-        .bar:hover { background-color: #1a73e8; transform: scaleY(1.02); }
+        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
         
         /* 최소/최대 강조 라벨 */
@@ -245,7 +249,6 @@
             for (let i = 0; i <= stepsCount; i++) {
                 const val = i * step;
                 const label = document.createElement('div');
-                // 최상단에만 단위 표시, 숫자와 분리하여 줄바꿈
                 label.innerHTML = (i === stepsCount) ? `${val}<br>(kWh)` : val;
                 yAxis.appendChild(label);
 
@@ -256,6 +259,38 @@
                 container.appendChild(line);
             }
             return maxVal;
+        };
+
+        // 드래그 스크롤 기능 추가
+        const setupDragScroll = (containerId) => {
+            const slider = document.getElementById(containerId);
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+                slider.style.scrollBehavior = 'auto'; // 드래그 중에는 부드러운 스크롤 끔
+            });
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+                slider.style.scrollBehavior = 'smooth';
+            });
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; // 스크롤 속도
+                slider.scrollLeft = scrollLeft - walk;
+            });
         };
 
         const renderDailyChart = () => {
@@ -316,7 +351,6 @@
             const maxVal = drawYAxisAndGrid('monthly-chart', 'monthly-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
-            let lastYear = null;
             months.forEach((month, index) => {
                 const usage = monthlyMap[month];
                 const bar = document.createElement('div');
@@ -340,13 +374,9 @@
                 label.className = 'bar-label';
                 const [y, m] = month.split('-');
                 
-                let labelHtml = `${m}월`;
-                if (index === 0 || y !== lastYear) {
-                    labelHtml += `<br>${y}`;
-                    lastYear = y;
-                }
+                // 월별 차트는 항상 연월을 표시
+                label.innerHTML = `${m}월<br>${y}`;
                 
-                label.innerHTML = labelHtml;
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
@@ -383,7 +413,10 @@
             }
         };
 
+        // 초기 실행
         updateUI();
+        setupDragScroll('daily-chart');
+        setupDragScroll('monthly-chart');
     </script>
 </body>
 </html>
