@@ -16,6 +16,14 @@
         button { background-color: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; transition: background-color 0.2s; }
         button:hover { background-color: #1765cc; }
         
+        /* 분석 결과 섹션 */
+        #analysis-results { min-height: 50px; background: #f8f9fa; border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid #f1f3f4; }
+        .analysis-empty { color: #70757a; text-align: center; padding: 15px 0; font-style: italic; }
+        .analysis-item { padding: 8px; border-bottom: 1px solid #d2e3fc; display: flex; justify-content: space-between; }
+        .analysis-item:last-child { border-bottom: none; }
+        .analysis-item span { color: #5f6368; }
+        .analysis-item strong { color: #1a73e8; }
+
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
         .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 55px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
@@ -51,9 +59,6 @@
         .data-list th { background-color: #f8f9fa; font-weight: 600; color: #5f6368; }
         .data-list tr:hover { background-color: #f1f3f4; }
         .usage-val { font-weight: bold; color: #1a73e8; }
-
-        /* 분석 결과 섹션 */
-        #analysis-results { display: none; margin-top: 15px; padding: 10px; background: #e8f0fe; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -62,13 +67,20 @@
     </div>
     <h1>EnergyTracker</h1>
 
-    <!-- 1. 사진 업로드 섹션 (다중 선택 가능) -->
+    <!-- 1. 사진 업로드 섹션 -->
     <div class="card upload-section">
         <h3>1. 월패드 사진 업로드</h3>
         <p style="font-size: 14px; color: #5f6368;">분석할 사진을 여러 장 선택할 수 있습니다.</p>
         <input type="file" id="photo-input" accept="image/*" multiple>
         <button id="analyze-btn">사진 분석 시작</button>
-        <div id="analysis-results"></div>
+    </div>
+
+    <!-- 사진 분석 결과 섹션 (새로운 위치) -->
+    <div class="card">
+        <h3>사진 분석 결과</h3>
+        <div id="analysis-results">
+            <div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>
+        </div>
     </div>
 
     <!-- 2. 월별 사용량 차트 -->
@@ -89,7 +101,7 @@
         </div>
     </div>
 
-    <!-- 4. 상세 사용 기록 (탭 적용) -->
+    <!-- 4. 상세 사용 기록 -->
     <div class="card">
         <h3>상세 사용 기록</h3>
         <div class="tabs">
@@ -162,22 +174,21 @@
             alert('임시 데이터를 사용하여 분석을 진행합니다. (OCR 목함수 작동)');
             analyzeBtn.disabled = true;
             analyzeBtn.textContent = '이미지 분석 중...';
-            analysisResults.style.display = 'block';
-            analysisResults.innerHTML = `<p><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</p>`;
+            analysisResults.innerHTML = `<div class="analysis-empty"><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
             const newData = await mockAnalyzeImage(photoInput.files);
             currentData = [...currentData, ...newData];
             updateUI();
 
+            // 상세 분석 결과 표시
             let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${newData.length}건)</p>`;
-            detailHtml += '<ul style="list-style: none; padding: 0; margin: 0;">';
             newData.forEach((data, index) => {
                 detailHtml += `
-                    <li style="padding: 5px 0; border-bottom: 1px solid #d2e3fc;">
-                        사진 ${index + 1}: <span style="color: #5f6368;">${data.date}</span> ➔ <strong>${data.usage} kWh</strong>
-                    </li>`;
+                    <div class="analysis-item">
+                        <span>사진 ${index + 1}: ${data.date}</span>
+                        <strong>${data.usage} kWh</strong>
+                    </div>`;
             });
-            detailHtml += '</ul>';
             
             analysisResults.innerHTML = detailHtml;
             analyzeBtn.disabled = false;
@@ -211,10 +222,8 @@
             const container = document.getElementById(containerId);
             yAxis.innerHTML = '';
             
-            // 기존 그리드 라인 제거
             container.querySelectorAll('.grid-line').forEach(el => el.remove());
 
-            // 눈금 수 계산 (최대값 기준 적절한 간격 설정)
             const step = maxUsage > 100 ? 50 : (maxUsage > 30 ? 10 : 5);
             const maxVal = Math.ceil(maxUsage / step) * step;
             const stepsCount = maxVal / step;
@@ -225,7 +234,6 @@
                 label.textContent = (i === stepsCount) ? `${val} kWh` : val;
                 yAxis.appendChild(label);
 
-                // 그리드 라인 추가
                 const line = document.createElement('div');
                 line.className = 'grid-line';
                 const bottomPos = (val / maxVal) * 200 + 50; 
@@ -256,7 +264,6 @@
                 bar.style.height = `${height}px`;
                 bar.title = `${item.date}: ${item.usage}kWh`;
                 
-                // 최소/최대값 라벨 추가
                 if (item.usage === maxUsage || item.usage === minUsage) {
                     const valLabel = document.createElement('div');
                     valLabel.className = 'value-label';
@@ -279,7 +286,6 @@
                 container.appendChild(bar);
             });
             
-            // 가로 스크롤을 위해 마지막 바로 스크롤
             setTimeout(() => { container.scrollLeft = container.scrollWidth; }, 100);
         };
 
