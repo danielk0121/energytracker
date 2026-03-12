@@ -9,10 +9,13 @@
         .card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h1 { color: #2c3e50; text-align: center; }
         .upload-section { background-color: #f8f9fa; text-align: center; }
-        .chart-placeholder { height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; color: #666; font-style: italic; }
+        .chart-container { height: 220px; border: 1px solid #eee; margin-top: 10px; display: flex; align-items: flex-end; gap: 2px; padding: 10px; overflow-x: auto; }
+        .bar { background-color: #3498db; width: 10px; border-radius: 2px 2px 0 0; }
+        .bar:hover { background-color: #2980b9; }
         button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
         button:hover { background-color: #2980b9; }
         input[type="file"] { margin-bottom: 10px; }
+        .data-info { font-size: 12px; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -25,20 +28,57 @@
     </div>
 
     <div class="card">
-        <h3>2. 이번 달 사용량 추이</h3>
-        <div class="chart-placeholder">
-            [ 여기에 일자별 차트가 표시됩니다 ]
+        <h3>2. 최근 40일 사용량 추이</h3>
+        <div id="chart" class="chart-container">
+            <!-- 차트 바가 여기에 생성됩니다 -->
         </div>
+        <div class="data-info">마지막 40일간의 일별 전력 사용량 (kWh)</div>
     </div>
 
     <div class="card">
         <h3>3. 실시간 요금 예측</h3>
-        <p>현재 사용량: <strong>150 kWh</strong></p>
-        <p>예상 요금: <strong>12,500 원</strong></p>
+        <p>최근 30일 합계: <strong id="total-usage">0 kWh</strong></p>
+        <p>예상 요금: <strong id="predicted-cost">0 원</strong></p>
     </div>
 
     <script>
-        // 향후 OCR 및 Chart 로직이 여기에 추가됩니다.
+        // 40일치 샘플 데이터 생성 (최근 40일)
+        const generateSampleData = () => {
+            const data = [];
+            const today = new Date();
+            for (let i = 39; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                // 일일 사용량 5kWh ~ 15kWh 사이 랜덤값 생성
+                const usage = (Math.random() * 10 + 5).toFixed(1);
+                data.push({
+                    date: date.toISOString().split('T')[0],
+                    usage: parseFloat(usage)
+                });
+            }
+            return data;
+        };
+
+        const sampleData = generateSampleData();
+        const chartContainer = document.getElementById('chart');
+        const totalUsageEl = document.getElementById('total-usage');
+        const predictedCostEl = document.getElementById('predicted-cost');
+
+        // 차트 그리기
+        sampleData.forEach(item => {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            // 높이 계산 (최대 15kWh 기준)
+            const height = (item.usage / 15) * 180;
+            bar.style.height = `${height}px`;
+            bar.title = `${item.date}: ${item.usage} kWh`;
+            chartContainer.appendChild(bar);
+        });
+
+        // 요금 계산 (간단 요금제 적용: 1kWh당 200원 가정)
+        const last30DaysUsage = sampleData.slice(10).reduce((acc, cur) => acc + cur.usage, 0);
+        totalUsageEl.textContent = `${last30DaysUsage.toFixed(1)} kWh`;
+        predictedCostEl.textContent = `${Math.floor(last30DaysUsage * 200).toLocaleString()} 원`;
     </script>
 </body>
 </html>
