@@ -17,17 +17,17 @@
         button:hover { background-color: #1765cc; }
         
         /* 차트 래퍼 및 y축 */
-        .chart-wrapper { display: flex; height: 240px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 45px; padding-bottom: 40px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
-        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 4px; padding-bottom: 40px; overflow-x: auto; overflow-y: hidden; position: relative; }
+        .chart-wrapper { display: flex; height: 260px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 45px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
+        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 4px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; }
         
         /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
 
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 12px; position: relative; cursor: pointer; z-index: 1; }
         .bar:hover { background-color: #1a73e8; }
-        .bar-label { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; }
-        .monthly .bar { background-color: #34a853; min-width: 30px; }
+        .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
+        .monthly .bar { background-color: #34a853; min-width: 45px; }
         
         /* 탭 스타일 */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f1f3f4; padding-bottom: 10px; }
@@ -219,7 +219,7 @@
                 // 그리드 라인 추가
                 const line = document.createElement('div');
                 line.className = 'grid-line';
-                const bottomPos = (val / maxVal) * 190 + 40; // padding-bottom 40px 보정
+                const bottomPos = (val / maxVal) * 200 + 50; // padding-bottom 50px 보정
                 line.style.bottom = `${bottomPos}px`;
                 container.appendChild(line);
             }
@@ -237,13 +237,15 @@
             recent30.forEach(item => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
-                const height = (item.usage / maxVal) * 190;
+                const height = (item.usage / maxVal) * 200;
                 bar.style.height = `${height}px`;
                 bar.title = `${item.date}: ${item.usage}kWh`;
                 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
-                label.textContent = item.date.split('-')[2];
+                const [y, m, d] = item.date.split('-');
+                label.innerHTML = `${m}-${d}<br>${y}`;
+                
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
@@ -262,13 +264,15 @@
                 const usage = monthlyMap[month];
                 const bar = document.createElement('div');
                 bar.className = 'bar';
-                const height = (usage / maxVal) * 190;
+                const height = (usage / maxVal) * 200;
                 bar.style.height = `${height}px`;
                 bar.title = `${month}: ${usage.toFixed(1)}kWh`;
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
-                label.textContent = month.split('-')[1] + '월';
+                const [y, m] = month.split('-');
+                label.innerHTML = `${m}월<br>${y}`;
+                
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
