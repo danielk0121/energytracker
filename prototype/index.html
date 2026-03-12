@@ -30,7 +30,7 @@
 
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
-        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 55px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 8px; box-sizing: border-box; }
+        .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; }
         .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 8px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; }
         
         /* 그리드 라인 */
@@ -141,7 +141,7 @@
         ];
 
         let currentData = [...FIXED_DATA];
-        let pendingData = []; // 분석 후 대기 중인 데이터
+        let pendingData = []; 
         let currentTab = 'monthly';
 
         // --- 2. 사진 분석 로직 ---
@@ -183,7 +183,6 @@
 
             pendingData = await mockAnalyzeImage(photoInput.files);
             
-            // 상세 분석 결과 표시 (반영 전)
             let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${pendingData.length}건)</p>`;
             pendingData.forEach((data, index) => {
                 detailHtml += `
@@ -196,19 +195,14 @@
             analysisResults.innerHTML = detailHtml;
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '사진 분석 시작';
-            applyBtn.style.display = 'block'; // 반영 버튼 표시
+            applyBtn.style.display = 'block'; 
         });
 
         applyBtn.addEventListener('click', () => {
             if (pendingData.length === 0) return;
-            
-            // 데이터 병합 및 UI 업데이트
             currentData = [...currentData, ...pendingData];
             updateUI();
-            
             alert(`${pendingData.length}건의 데이터가 차트와 목록에 반영되었습니다.`);
-            
-            // 초기화
             pendingData = [];
             analysisResults.innerHTML = `<div class="analysis-empty">반영이 완료되었습니다. 새로운 사진을 분석할 수 있습니다.</div>`;
             applyBtn.style.display = 'none';
@@ -251,7 +245,8 @@
             for (let i = 0; i <= stepsCount; i++) {
                 const val = i * step;
                 const label = document.createElement('div');
-                label.textContent = (i === stepsCount) ? `${val} kWh` : val;
+                // 최상단에만 단위 표시, 숫자와 분리하여 줄바꿈
+                label.innerHTML = (i === stepsCount) ? `${val}<br>(kWh)` : val;
                 yAxis.appendChild(label);
 
                 const line = document.createElement('div');
