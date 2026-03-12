@@ -119,6 +119,7 @@
         <div class="filter-group">
             <button id="filter-monthly-13" class="filter-btn active" onclick="updateMonthlyFilter('13months')">최근 13개월</button>
             <button id="filter-monthly-year" class="filter-btn" onclick="updateMonthlyFilter('thisyear')">이번 연도</button>
+            <button id="filter-monthly-last" class="filter-btn" onclick="updateMonthlyFilter('lastyear')">작년</button>
             <button id="filter-monthly-24" class="filter-btn" onclick="updateMonthlyFilter('2years')">최근 2년</button>
         </div>
         <div id="monthly-wrapper" class="chart-wrapper">
@@ -303,6 +304,7 @@
             monthlyFilter = filter;
             document.getElementById('filter-monthly-13').classList.toggle('active', filter === '13months');
             document.getElementById('filter-monthly-year').classList.toggle('active', filter === 'thisyear');
+            document.getElementById('filter-monthly-last').classList.toggle('active', filter === 'lastyear');
             document.getElementById('filter-monthly-24').classList.toggle('active', filter === '2years');
             renderMonthlyChart();
         };
@@ -476,13 +478,22 @@
 
             let months = Object.keys(monthlyMap).sort();
             const currentYear = "2026";
+            const lastYear = "2025";
 
             if (monthlyFilter === '13months') {
                 months = months.slice(-13);
             } else if (monthlyFilter === 'thisyear') {
                 months = months.filter(m => m.startsWith(currentYear));
+            } else if (monthlyFilter === 'lastyear') {
+                months = months.filter(m => m.startsWith(lastYear));
             } else if (monthlyFilter === '2years') {
                 months = months.slice(-24);
+            }
+
+            if (months.length === 0) {
+                container.innerHTML = '<div class="analysis-empty">해당 기간의 데이터가 없습니다.</div>';
+                summaryContainer.innerHTML = '';
+                return;
             }
 
             const usages = months.map(m => monthlyMap[m]);
