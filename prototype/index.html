@@ -83,14 +83,14 @@
     <div class="card">
         <h3>상세 사용 기록</h3>
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('daily')">일자별 목록</button>
-            <button class="tab-btn" onclick="switchTab('monthly')">월별 목록</button>
+            <button id="tab-monthly" class="tab-btn active" onclick="switchTab('monthly')">월별 목록</button>
+            <button id="tab-daily" class="tab-btn" onclick="switchTab('daily')">일자별 목록</button>
         </div>
         <table class="data-list">
             <thead>
                 <tr id="list-header">
-                    <th>날짜</th>
-                    <th>사용량 (kWh)</th>
+                    <th>월</th>
+                    <th>총 사용량 (kWh)</th>
                 </tr>
             </thead>
             <tbody id="usage-list-body">
@@ -118,7 +118,7 @@
         ];
 
         let currentData = [...FIXED_DATA];
-        let currentTab = 'daily';
+        let currentTab = 'monthly';
 
         // --- 2. 사진 분석 로직 (목함수) ---
 
@@ -181,8 +181,8 @@
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', 
-                    (tab === 'daily' && btn.textContent === '일자별 목록') || 
-                    (tab === 'monthly' && btn.textContent === '월별 목록')
+                    (tab === 'daily' && btn.id === 'tab-daily') || 
+                    (tab === 'monthly' && btn.id === 'tab-monthly')
                 );
             });
             document.getElementById('list-header').innerHTML = 
