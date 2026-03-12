@@ -22,8 +22,11 @@
         .thumbnail { width: calc(100% / 6 - 10px); aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; border: 1px solid #dadce0; background-color: #eee; }
         @media (max-width: 400px) { .thumbnail { width: calc(100% / 4 - 10px); } }
 
-        .btn-apply { background-color: #34a853; margin-top: 15px; display: none; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-apply { background-color: #34a853; flex: 2; display: none; }
         .btn-apply:hover { background-color: #2d8e47; }
+        .btn-reset { background-color: #5f6368; flex: 1; display: none; }
+        .btn-reset:hover { background-color: #494c50; }
 
         /* 분석 결과 섹션 */
         #analysis-results { min-height: 50px; background: #f8f9fa; border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid #f1f3f4; }
@@ -43,8 +46,8 @@
         .chart-container::-webkit-scrollbar { display: none; }
         .chart-container { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 그리드 라인 (스크롤되지 않도록 고정) */
-        .grid-line { position: absolute; left: 50px; /* y-axis 너비 + 패딩 */ right: 10px; border-top: 1px dashed rgba(200, 200, 200, 0.5); z-index: 8; pointer-events: none; }
+        /* 그리드 라인 */
+        .grid-line { position: absolute; left: 50px; right: 10px; border-top: 1px dashed rgba(200, 200, 200, 0.5); z-index: 8; pointer-events: none; }
 
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 32px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
@@ -91,7 +94,10 @@
         <div id="analysis-results">
             <div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>
         </div>
-        <button id="apply-btn" class="btn-apply">데이터 반영하기</button>
+        <div class="btn-group">
+            <button id="apply-btn" class="btn-apply">데이터 반영하기</button>
+            <button id="reset-btn" class="btn-reset">초기화</button>
+        </div>
     </div>
 
     <!-- 2. 월별 사용량 차트 -->
@@ -170,11 +176,12 @@
         const thumbnailPreview = document.getElementById('thumbnail-preview');
         const analyzeBtn = document.getElementById('analyze-btn');
         const applyBtn = document.getElementById('apply-btn');
+        const resetBtn = document.getElementById('reset-btn');
         const analysisResults = document.getElementById('analysis-results');
 
         photoInput.addEventListener('change', (e) => {
             thumbnailPreview.innerHTML = '';
-            if (e.target.files) {
+            if (e.target.files && e.target.files.length > 0) {
                 Array.from(e.target.files).forEach(file => {
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(file);
@@ -182,6 +189,7 @@
                     img.onload = () => URL.revokeObjectURL(img.src);
                     thumbnailPreview.appendChild(img);
                 });
+                resetBtn.style.display = 'block';
             }
         });
 
@@ -219,6 +227,7 @@
             analyzeBtn.disabled = true;
             analyzeBtn.textContent = '이미지 분석 중...';
             applyBtn.style.display = 'none';
+            resetBtn.style.display = 'block';
             analysisResults.innerHTML = `<div class="analysis-empty"><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
             pendingData = await mockAnalyzeImage(photoInput.files);
@@ -243,11 +252,23 @@
             currentData = [...currentData, ...pendingData];
             updateUI();
             alert(`${pendingData.length}건의 데이터가 차트와 목록에 반영되었습니다.`);
-            pendingData = [];
-            analysisResults.innerHTML = `<div class="analysis-empty">반영이 완료되었습니다. 새로운 사진을 분석할 수 있습니다.</div>`;
-            applyBtn.style.display = 'none';
+            // 데이터 반영 후에도 결과는 유지하되, 버튼 상태만 조정할 수 있으나 
+            // 여기서는 요청에 따라 초기화하지 않고 유지합니다.
+            applyBtn.disabled = true;
+            applyBtn.textContent = '반영 완료';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (!confirm('업로드된 사진과 분석 결과를 초기화하시겠습니까?')) return;
+            
             photoInput.value = '';
             thumbnailPreview.innerHTML = '';
+            analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>`;
+            pendingData = [];
+            applyBtn.style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.textContent = '데이터 반영하기';
+            resetBtn.style.display = 'none';
         });
 
         // --- 3. UI 렌더링 및 탭 로직 ---
@@ -276,8 +297,6 @@
             const yAxis = document.getElementById(yAxisId);
             const wrapper = document.getElementById(wrapperId);
             yAxis.innerHTML = '';
-            
-            // 기존 그리드 라인 제거 (wrapper에서 제거)
             wrapper.querySelectorAll('.grid-line').forEach(el => el.remove());
 
             const step = maxUsage > 100 ? 50 : (maxUsage > 30 ? 10 : 5);
@@ -290,7 +309,6 @@
                 label.innerHTML = (i === stepsCount) ? `${val}<br>(kWh)` : val;
                 yAxis.appendChild(label);
 
-                // 그리드 라인 추가 (스크롤되지 않는 wrapper에 추가)
                 const line = document.createElement('div');
                 line.className = 'grid-line';
                 const bottomPos = (val / maxVal) * 200 + 50; 
