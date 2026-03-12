@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnergyTracker Prototype</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .upload-section { background-color: #f8f9fa; text-align: center; }
+        .chart-placeholder { height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; color: #666; font-style: italic; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+        input[type="file"] { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>에너지 트래커</h1>
+
+    <div class="card upload-section">
+        <h3>1. 월패드 사진 올리기</h3>
+        <input type="file" accept="image/*">
+        <button onclick="alert('데이터 추출 중...')">사진 분석 시작</button>
+    </div>
+
+    <div class="card">
+        <h3>2. 이번 달 사용량 추이</h3>
+        <div class="chart-placeholder">
+            [ 여기에 일자별 차트가 표시됩니다 ]
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>3. 실시간 요금 예측</h3>
+        <p>현재 사용량: <strong>150 kWh</strong></p>
+        <p>예상 요금: <strong>12,500 원</strong></p>
+    </div>
+
+    <script>
+        // 향후 OCR 및 Chart 로직이 여기에 추가됩니다.
+    </script>
+</body>
+</html>

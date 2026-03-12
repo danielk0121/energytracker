@@ -12,14 +12,22 @@
 3. **사용량 시각화**: 추출된 데이터를 기반으로 일자별, 월별 사용 추이를 차트로 보여줍니다.
 4. **이력 관리**: 과거 사용 데이터를 보관하여 전기 요금을 예측하거나 절약 계획을 세울 수 있도록 돕습니다.
 
+## 🗺 개발 로드맵
+- [ ] **Phase 1: 웹 프로토타입 개발**
+    - 기본적인 데이터 입력 및 시각화 UI 구현
+    - 모바일 웹 최적화 레이아웃 구성
+- [ ] **Phase 2: OCR 기능 추가**
+    - 이미지 분석 엔진 연동 (Tesseract.js 등)
+    - 월패드 화면 특화 데이터 추출 알고리즘 개발
+- [ ] **Phase 3: 안드로이드 앱 개발**
+    - 카메라 연동 및 네이티브 기능 강화
+    - 푸시 알림 (요금 목표 달성 등) 기능 추가
+
 ## 🛠 기술 스택 (예정)
 - **Frontend**: React (TypeScript) / Mobile-friendly Web
 - **Backend**: Node.js (Express) or Python (FastAPI)
-- **Image Analysis**: Tesseract.js / Google Cloud Vision / AWS Textract 등 OCR 기술
+- **Image Analysis**: Tesseract.js / Google Cloud Vision 등
 - **Charts**: Chart.js / Recharts
 
-## 📅 향후 계획
-- [ ] 이미지 분석 프로토타입 개발
-- [ ] 데이터 저장소 및 API 설계
-- [ ] 모바일 최적화 UI/UX 디자인
-- [ ] 대시보드 및 차트 구현
+---
+*현재 Phase 1: 웹 프로토타입 단계가 진행 중입니다.*
