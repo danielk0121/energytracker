@@ -5,52 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EnergyTracker Prototype</title>
     <style>
-        body { font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-        .card { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        .upload-section { background-color: #f8f9fa; text-align: center; }
-        .chart-container { height: 220px; border: 1px solid #eee; margin-top: 10px; display: flex; align-items: flex-end; gap: 2px; padding: 10px; overflow-x: auto; }
-        .bar { background-color: #3498db; width: 10px; border-radius: 2px 2px 0 0; }
-        .bar:hover { background-color: #2980b9; }
-        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background-color: #2980b9; }
-        input[type="file"] { margin-bottom: 10px; }
-        .data-info { font-size: 12px; color: #666; margin-top: 5px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #333; background-color: #f0f2f5; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        h1 { color: #1a73e8; text-align: center; margin-bottom: 30px; }
+        h3 { margin-top: 0; color: #202124; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px; margin-bottom: 15px; }
+        
+        /* 업로드 섹션 */
+        .upload-section { text-align: center; border: 2px dashed #dadce0; background-color: #f8f9fa; }
+        input[type="file"] { display: block; width: 100%; margin: 15px 0; }
+        button { background-color: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; transition: background-color 0.2s; }
+        button:hover { background-color: #1765cc; }
+        
+        /* 차트 공통 */
+        .chart-container { height: 180px; display: flex; align-items: flex-end; gap: 4px; padding: 10px; background: #fafafa; border-radius: 8px; overflow-x: auto; margin-bottom: 10px; }
+        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 12px; position: relative; cursor: pointer; }
+        .bar:hover { background-color: #1a73e8; }
+        .bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; }
+        .monthly .bar { background-color: #34a853; min-width: 30px; }
+        
+        /* 데이터 목록 */
+        .data-list { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .data-list th, .data-list td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f3f4; }
+        .data-list th { background-color: #f8f9fa; font-weight: 600; color: #5f6368; }
+        .data-list tr:hover { background-color: #f1f3f4; }
+        .usage-val { font-weight: bold; color: #1a73e8; }
+
+        /* 분석 결과 섹션 */
+        #analysis-results { display: none; margin-top: 15px; padding: 10px; background: #e8f0fe; border-radius: 8px; font-size: 14px; }
     </style>
 </head>
 <body>
-    <h1>에너지 트래커</h1>
+    <h1>EnergyTracker</h1>
 
+    <!-- 1. 사진 업로드 섹션 (다중 선택 가능) -->
     <div class="card upload-section">
-        <h3>1. 월패드 사진 올리기</h3>
-        <input type="file" accept="image/*">
-        <button onclick="alert('데이터 추출 중...')">사진 분석 시작</button>
+        <h3>1. 월패드 사진 업로드</h3>
+        <p style="font-size: 14px; color: #5f6368;">분석할 사진을 여러 장 선택할 수 있습니다.</p>
+        <input type="file" id="photo-input" accept="image/*" multiple>
+        <button id="analyze-btn">사진 분석 시작</button>
+        <div id="analysis-results"></div>
     </div>
 
+    <!-- 2. 월별 사용량 차트 -->
     <div class="card">
-        <h3>2. 최근 40일 사용량 추이</h3>
-        <div id="chart" class="chart-container">
-            <!-- 차트 바가 여기에 생성됩니다 -->
-        </div>
-        <div class="data-info">마지막 40일간의 일별 전력 사용량 (kWh)</div>
+        <h3>월별 사용량 (최근 3개월)</h3>
+        <div id="monthly-chart" class="chart-container monthly"></div>
     </div>
 
+    <!-- 3. 일자별 사용량 차트 -->
     <div class="card">
-        <h3>3. 실시간 요금 예측</h3>
-        <p>최근 30일 합계: <strong id="total-usage">0 kWh</strong></p>
-        <p>예상 요금: <strong id="predicted-cost">0 원</strong></p>
+        <h3>일자별 사용량 (최근 30일)</h3>
+        <div id="daily-chart" class="chart-container"></div>
+    </div>
+
+    <!-- 4. 일자별 사용량 목록 -->
+    <div class="card">
+        <h3>상세 사용 기록</h3>
+        <table class="data-list">
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>사용량 (kWh)</th>
+                </tr>
+            </thead>
+            <tbody id="usage-list-body">
+                <!-- 목록이 여기에 생성됩니다 -->
+            </tbody>
+        </table>
     </div>
 
     <script>
-        // 40일치 샘플 데이터 생성 (최근 40일)
-        const generateSampleData = () => {
+        // --- 1. 데이터 생성 및 관리 ---
+        
+        // 40일치 샘플 데이터 생성
+        const generateInitialData = () => {
             const data = [];
             const today = new Date();
             for (let i = 39; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(today.getDate() - i);
-                // 일일 사용량 5kWh ~ 15kWh 사이 랜덤값 생성
-                const usage = (Math.random() * 10 + 5).toFixed(1);
+                const usage = (Math.random() * 8 + 4).toFixed(1); // 4~12kWh 랜덤
                 data.push({
                     date: date.toISOString().split('T')[0],
                     usage: parseFloat(usage)
@@ -59,26 +93,143 @@
             return data;
         };
 
-        const sampleData = generateSampleData();
-        const chartContainer = document.getElementById('chart');
-        const totalUsageEl = document.getElementById('total-usage');
-        const predictedCostEl = document.getElementById('predicted-cost');
+        let currentData = generateInitialData();
 
-        // 차트 그리기
-        sampleData.forEach(item => {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            // 높이 계산 (최대 15kWh 기준)
-            const height = (item.usage / 15) * 180;
-            bar.style.height = `${height}px`;
-            bar.title = `${item.date}: ${item.usage} kWh`;
-            chartContainer.appendChild(bar);
+        // --- 2. 사진 분석 로직 (목함수) ---
+
+        /**
+         * TODO: 향후 서버 API 또는 클라이언트 OCR 라이브러리(Tesseract.js 등) 연동 필요
+         */
+        const mockAnalyzeImage = (files) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const extracted = [];
+                    const today = new Date();
+                    
+                    // 선택된 파일 개수만큼 목데이터 생성
+                    for (let i = 0; i < files.length; i++) {
+                        const date = new Date();
+                        date.setDate(today.getDate() + i + 1); // 내일 이후 데이터 시뮬레이션
+                        extracted.push({
+                            date: date.toISOString().split('T')[0],
+                            usage: (Math.random() * 5 + 7).toFixed(1)
+                        });
+                    }
+                    resolve(extracted);
+                }, 1500); // 1.5초 분석 대기 시뮬레이션
+            });
+        };
+
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const photoInput = document.getElementById('photo-input');
+        const analysisResults = document.getElementById('analysis-results');
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (!photoInput.files || photoInput.files.length === 0) {
+                alert('분석할 사진을 먼저 선택해주세요.');
+                return;
+            }
+
+            alert('임시 데이터를 사용하여 분석을 진행합니다. (OCR 목함수 작동)');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '이미지 분석 중...';
+            analysisResults.style.display = 'block';
+            analysisResults.textContent = `${photoInput.files.length}장의 사진을 분석 중입니다...`;
+
+            const newData = await mockAnalyzeImage(photoInput.files);
+            
+            // 데이터 병합 및 UI 업데이트
+            currentData = [...currentData, ...newData];
+            updateUI();
+
+            analysisResults.innerHTML = `<strong>분석 완료:</strong> ${newData.length}개의 데이터가 추가되었습니다.`;
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = '사진 분석 시작';
         });
 
-        // 요금 계산 (간단 요금제 적용: 1kWh당 200원 가정)
-        const last30DaysUsage = sampleData.slice(10).reduce((acc, cur) => acc + cur.usage, 0);
-        totalUsageEl.textContent = `${last30DaysUsage.toFixed(1)} kWh`;
-        predictedCostEl.textContent = `${Math.floor(last30DaysUsage * 200).toLocaleString()} 원`;
+        // --- 3. UI 렌더링 로직 ---
+
+        const updateUI = () => {
+            renderDailyChart();
+            renderMonthlyChart();
+            renderUsageList();
+        };
+
+        // 일자별 차트 (최근 30일)
+        const renderDailyChart = () => {
+            const container = document.getElementById('daily-chart');
+            container.innerHTML = '';
+            const recent30 = currentData.slice(-30);
+            const maxUsage = Math.max(...recent30.map(d => d.usage));
+
+            recent30.forEach(item => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = (item.usage / maxUsage) * 150;
+                bar.style.height = `${height}px`;
+                bar.title = `${item.date}: ${item.usage}kWh`;
+                
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = item.date.split('-')[2]; // '일'만 표시
+                bar.appendChild(label);
+                
+                container.appendChild(bar);
+            });
+        };
+
+        // 월별 차트
+        const renderMonthlyChart = () => {
+            const container = document.getElementById('monthly-chart');
+            container.innerHTML = '';
+            
+            // 월별 데이터 집계
+            const monthlyMap = {};
+            currentData.forEach(item => {
+                const month = item.date.substring(0, 7); // 'YYYY-MM'
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.usage;
+            });
+
+            const months = Object.keys(monthlyMap).sort();
+            const maxVal = Math.max(...Object.values(monthlyMap));
+
+            months.forEach(month => {
+                const usage = monthlyMap[month];
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = (usage / maxVal) * 150;
+                bar.style.height = `${height}px`;
+                bar.title = `${month}: ${usage.toFixed(1)}kWh`;
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = month.split('-')[1] + '월';
+                bar.appendChild(label);
+
+                container.appendChild(bar);
+            });
+        };
+
+        // 상세 목록
+        const renderUsageList = () => {
+            const tbody = document.getElementById('usage-list-body');
+            tbody.innerHTML = '';
+            
+            // 최신순 정렬
+            const sortedData = [...currentData].sort((a, b) => b.date.localeCompare(a.date));
+
+            sortedData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td class="usage-val">${item.usage.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // 초기 실행
+        updateUI();
     </script>
 </body>
 </html>
