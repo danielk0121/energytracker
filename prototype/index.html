@@ -32,20 +32,18 @@
         /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
 
+        /* 막대 색상 파란색으로 통일 */
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; }
         .bar:hover { background-color: #1a73e8; transform: scaleY(1.02); }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
         
-        /* 최소/최대 강조 */
-        .bar.max { background-color: #ea4335; }
-        .bar.min { background-color: #fbbc05; }
-        .value-label { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: bold; white-space: nowrap; }
-        .bar.max .value-label { color: #ea4335; }
-        .bar.min .value-label { color: #f29900; }
+        /* 최소/최대 강조 라벨 */
+        .value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
+        .bar.max .value-label { color: #ea4335; } /* 최대값: 빨간색 */
+        .bar.min .value-label { color: #34a853; } /* 최소값: 초록색 */
+        .arrow { font-size: 12px; }
 
-        .monthly .bar { background-color: #34a853; min-width: 50px; }
-        .monthly .bar.max { background-color: #ea4335; }
-        .monthly .bar.min { background-color: #fbbc05; }
+        .monthly .bar { min-width: 50px; }
         
         /* 탭 스타일 */
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #f1f3f4; padding-bottom: 10px; }
@@ -75,7 +73,7 @@
         <button id="analyze-btn">사진 분석 시작</button>
     </div>
 
-    <!-- 사진 분석 결과 섹션 (새로운 위치) -->
+    <!-- 사진 분석 결과 섹션 -->
     <div class="card">
         <h3>사진 분석 결과</h3>
         <div id="analysis-results">
@@ -180,7 +178,6 @@
             currentData = [...currentData, ...newData];
             updateUI();
 
-            // 상세 분석 결과 표시
             let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${newData.length}건)</p>`;
             newData.forEach((data, index) => {
                 detailHtml += `
@@ -267,7 +264,8 @@
                 if (item.usage === maxUsage || item.usage === minUsage) {
                     const valLabel = document.createElement('div');
                     valLabel.className = 'value-label';
-                    valLabel.textContent = item.usage;
+                    const arrow = item.usage === maxUsage ? '↑' : '↓';
+                    valLabel.innerHTML = `<span>${item.usage}</span><span class="arrow">${arrow}</span>`;
                     bar.appendChild(valLabel);
                 }
 
@@ -315,7 +313,8 @@
                 if (usage === maxUsage || usage === minUsage) {
                     const valLabel = document.createElement('div');
                     valLabel.className = 'value-label';
-                    valLabel.textContent = usage.toFixed(1);
+                    const arrow = usage === maxUsage ? '↑' : '↓';
+                    valLabel.innerHTML = `<span>${usage.toFixed(1)}</span><span class="arrow">${arrow}</span>`;
                     bar.appendChild(valLabel);
                 }
 
