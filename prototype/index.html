@@ -133,7 +133,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1025-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1035-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -237,7 +237,7 @@
     <div class="card">
         <h3>상세 사용 기록</h3>
         <div class="tabs">
-            <button id="tab-monthly" class="tab-btn active" onclick="switchTab('monthly')">월별 목록</button>
+            <button id="tab-monthly" class="tab-btn" onclick="switchTab('monthly')">월별 목록</button>
             <button id="tab-daily" class="tab-btn" onclick="switchTab('daily')">일자별 목록</button>
         </div>
         <table class="data-list">
@@ -484,7 +484,7 @@
         const switchTab = (tab) => {
             currentTab = tab;
             saveState();
-            renderUsageList();
+            updateUI();
         };
 
         const updateUI = () => {
