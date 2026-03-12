@@ -134,7 +134,7 @@
             analyzeBtn.disabled = true;
             analyzeBtn.textContent = '이미지 분석 중...';
             analysisResults.style.display = 'block';
-            analysisResults.textContent = `${photoInput.files.length}장의 사진을 분석 중입니다...`;
+            analysisResults.innerHTML = `<p><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</p>`;
 
             const newData = await mockAnalyzeImage(photoInput.files);
             
@@ -142,7 +142,18 @@
             currentData = [...currentData, ...newData];
             updateUI();
 
-            analysisResults.innerHTML = `<strong>분석 완료:</strong> ${newData.length}개의 데이터가 추가되었습니다.`;
+            // 상세 분석 결과 표시
+            let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${newData.length}건)</p>`;
+            detailHtml += '<ul style="list-style: none; padding: 0; margin: 0;">';
+            newData.forEach((data, index) => {
+                detailHtml += `
+                    <li style="padding: 5px 0; border-bottom: 1px solid #d2e3fc;">
+                        사진 ${index + 1}: <span style="color: #5f6368;">${data.date}</span> ➔ <strong>${data.usage} kWh</strong>
+                    </li>`;
+            });
+            detailHtml += '</ul>';
+            
+            analysisResults.innerHTML = detailHtml;
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '사진 분석 시작';
         });
