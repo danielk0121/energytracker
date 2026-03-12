@@ -133,7 +133,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1055-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1105-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -240,6 +240,14 @@
             <button id="tab-monthly" class="tab-btn" onclick="switchTab('monthly')">월별 목록</button>
             <button id="tab-daily" class="tab-btn" onclick="switchTab('daily')">일자별 목록</button>
         </div>
+        <div class="filter-group">
+            <button id="filter-list-40" class="filter-btn" onclick="updateListFilter('40days')">최근 40일</button>
+            <button id="filter-list-thismonth" class="filter-btn" onclick="updateListFilter('thismonth')">이번 달</button>
+            <button id="filter-list-lastmonth" class="filter-btn" onclick="updateListFilter('lastmonth')">저번 달</button>
+            <button id="filter-list-thisyear" class="filter-btn" onclick="updateListFilter('thisyear')">이번 연도</button>
+            <button id="filter-list-lastyear" class="filter-btn" onclick="updateListFilter('lastyear')">작년</button>
+            <button id="filter-list-2years" class="filter-btn" onclick="updateListFilter('2years')">최근 2년</button>
+        </div>
         <table class="data-list">
             <thead>
                 <tr id="list-header">
@@ -296,6 +304,7 @@
         let currentTab = 'monthly';
         let monthlyFilter = '13months';
         let dailyFilter = '40days';
+        let listFilter = '40days';
         let uploadedFilesData = []; // Base64 형식으로 파일 데이터 저장
 
         // --- 2. 상태 보존 (sessionStorage) ---
@@ -306,7 +315,8 @@
                 uploadedFilesData,
                 currentTab,
                 monthlyFilter,
-                dailyFilter
+                dailyFilter,
+                listFilter
             };
             sessionStorage.setItem('energyTrackerState', JSON.stringify(state));
         };
@@ -321,6 +331,7 @@
                 currentTab = state.currentTab;
                 monthlyFilter = state.monthlyFilter;
                 dailyFilter = state.dailyFilter;
+                listFilter = state.listFilter || '40days';
                 
                 // UI 복구
                 renderThumbnails();
@@ -481,6 +492,12 @@
             updateUI();
         };
 
+        const updateListFilter = (filter) => {
+            listFilter = filter;
+            saveState();
+            updateUI();
+        };
+
         const switchTab = (tab) => {
             currentTab = tab;
             saveState();
@@ -498,6 +515,13 @@
             document.getElementById('filter-daily-month').classList.toggle('active', dailyFilter === 'thismonth');
             document.getElementById('filter-daily-last').classList.toggle('active', dailyFilter === 'lastmonth');
             document.getElementById('filter-daily-year').classList.toggle('active', dailyFilter === 'thisyear');
+
+            document.getElementById('filter-list-40').classList.toggle('active', listFilter === '40days');
+            document.getElementById('filter-list-thismonth').classList.toggle('active', listFilter === 'thismonth');
+            document.getElementById('filter-list-lastmonth').classList.toggle('active', listFilter === 'lastmonth');
+            document.getElementById('filter-list-thisyear').classList.toggle('active', listFilter === 'thisyear');
+            document.getElementById('filter-list-lastyear').classList.toggle('active', listFilter === 'lastyear');
+            document.getElementById('filter-list-2years').classList.toggle('active', listFilter === '2years');
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', 
@@ -746,14 +770,36 @@
             const tbody = document.getElementById('usage-list-body');
             tbody.innerHTML = '';
             
+            const currentYear = "2026";
+            const currentMonth = "2026-03";
+            const lastMonth = "2026-02";
+            const lastYear = "2025";
+
             if (currentTab === 'daily') {
-                const sortedData = [...currentData].sort((a, b) => a.date.localeCompare(b.date));
+                let sortedData = [...currentData].sort((a, b) => a.date.localeCompare(b.date));
                 const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
                 
+                // 필터 적용
+                if (listFilter === '40days') {
+                    sortedData = sortedData.slice(-40);
+                } else if (listFilter === 'thismonth') {
+                    sortedData = sortedData.filter(d => d.date.startsWith(currentMonth));
+                } else if (listFilter === 'lastmonth') {
+                    sortedData = sortedData.filter(d => d.date.startsWith(lastMonth));
+                } else if (listFilter === 'thisyear') {
+                    sortedData = sortedData.filter(d => d.date.startsWith(currentYear));
+                } else if (listFilter === 'lastyear') {
+                    sortedData = sortedData.filter(d => d.date.startsWith(lastYear));
+                } else if (listFilter === '2years') {
+                    sortedData = sortedData.slice(-730); // 약 2년치 데이터
+                }
+
                 sortedData.forEach((item, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
-                    if (index > 0) {
-                        const diff = (item.usage - sortedData[index-1].usage).toFixed(1);
+                    // 원본 데이터 기준으로 등락 계산을 위해 index 대신 실제 데이터 배열에서 찾기
+                    const realIndex = FIXED_DATA.findIndex(d => d.date === item.date);
+                    if (realIndex > 0) {
+                        const diff = (item.usage - FIXED_DATA[realIndex-1].usage).toFixed(1);
                         if (diff > 0) variationHtml = `<span class="variation up">▲${diff}</span>`;
                         else if (diff < 0) variationHtml = `<span class="variation down">▼${Math.abs(diff)}</span>`;
                     }
@@ -774,11 +820,30 @@
                 });
             } else {
                 const monthlyMap = getMonthlyData();
-                const sortedMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
+                let sortedMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
+                
+                // 필터 적용
+                if (listFilter === '40days') {
+                    sortedMonths = sortedMonths.slice(-2); // 40일은 약 2개월
+                } else if (listFilter === 'thismonth') {
+                    sortedMonths = sortedMonths.filter(m => m === currentMonth);
+                } else if (listFilter === 'lastmonth') {
+                    sortedMonths = sortedMonths.filter(m => m === lastMonth);
+                } else if (listFilter === 'thisyear') {
+                    sortedMonths = sortedMonths.filter(m => m.startsWith(currentYear));
+                } else if (listFilter === 'lastyear') {
+                    sortedMonths = sortedMonths.filter(m => m.startsWith(lastYear));
+                } else if (listFilter === '2years') {
+                    sortedMonths = sortedMonths.slice(-24);
+                }
+
                 sortedMonths.forEach((month, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
-                    if (index > 0) {
-                        const diff = (monthlyMap[month] - monthlyMap[sortedMonths[index-1]]).toFixed(1);
+                    const allMonths = Object.keys(monthlyMap).sort((a, b) => a.localeCompare(b));
+                    const realIndex = allMonths.indexOf(month);
+                    
+                    if (realIndex > 0) {
+                        const diff = (monthlyMap[month] - monthlyMap[allMonths[realIndex-1]]).toFixed(1);
                         if (diff > 0) variationHtml = `<span class="variation up">▲${diff}</span>`;
                         else if (diff < 0) variationHtml = `<span class="variation down">▼${Math.abs(diff)}</span>`;
                     }
