@@ -15,7 +15,11 @@
         input[type="file"] { display: block; width: 100%; margin: 15px 0; }
         button { background-color: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; transition: background-color 0.2s; }
         button:hover { background-color: #1765cc; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
         
+        .btn-apply { background-color: #34a853; margin-top: 15px; display: none; }
+        .btn-apply:hover { background-color: #2d8e47; }
+
         /* 분석 결과 섹션 */
         #analysis-results { min-height: 50px; background: #f8f9fa; border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid #f1f3f4; }
         .analysis-empty { color: #70757a; text-align: center; padding: 15px 0; font-style: italic; }
@@ -32,15 +36,14 @@
         /* 그리드 라인 */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
 
-        /* 막대 색상 파란색으로 통일 */
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; }
         .bar:hover { background-color: #1a73e8; transform: scaleY(1.02); }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
         
         /* 최소/최대 강조 라벨 */
         .value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
-        .bar.max .value-label { color: #ea4335; } /* 최대값: 빨간색 */
-        .bar.min .value-label { color: #34a853; } /* 최소값: 초록색 */
+        .bar.max .value-label { color: #ea4335; }
+        .bar.min .value-label { color: #34a853; }
         .arrow { font-size: 12px; }
 
         .monthly .bar { min-width: 50px; }
@@ -79,6 +82,7 @@
         <div id="analysis-results">
             <div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>
         </div>
+        <button id="apply-btn" class="btn-apply">데이터 반영하기</button>
     </div>
 
     <!-- 2. 월별 사용량 차트 -->
@@ -137,9 +141,10 @@
         ];
 
         let currentData = [...FIXED_DATA];
+        let pendingData = []; // 분석 후 대기 중인 데이터
         let currentTab = 'monthly';
 
-        // --- 2. 사진 분석 로직 (목함수) ---
+        // --- 2. 사진 분석 로직 ---
 
         const mockAnalyzeImage = (files) => {
             return new Promise((resolve) => {
@@ -151,7 +156,7 @@
                         date.setDate(today.getDate() + i + 1);
                         extracted.push({
                             date: date.toISOString().split('T')[0],
-                            usage: (Math.random() * 5 + 7).toFixed(1)
+                            usage: parseFloat((Math.random() * 5 + 7).toFixed(1))
                         });
                     }
                     resolve(extracted);
@@ -160,6 +165,7 @@
         };
 
         const analyzeBtn = document.getElementById('analyze-btn');
+        const applyBtn = document.getElementById('apply-btn');
         const photoInput = document.getElementById('photo-input');
         const analysisResults = document.getElementById('analysis-results');
 
@@ -172,14 +178,14 @@
             alert('임시 데이터를 사용하여 분석을 진행합니다. (OCR 목함수 작동)');
             analyzeBtn.disabled = true;
             analyzeBtn.textContent = '이미지 분석 중...';
+            applyBtn.style.display = 'none';
             analysisResults.innerHTML = `<div class="analysis-empty"><strong>${photoInput.files.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
-            const newData = await mockAnalyzeImage(photoInput.files);
-            currentData = [...currentData, ...newData];
-            updateUI();
-
-            let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${newData.length}건)</p>`;
-            newData.forEach((data, index) => {
+            pendingData = await mockAnalyzeImage(photoInput.files);
+            
+            // 상세 분석 결과 표시 (반영 전)
+            let detailHtml = `<p style="color: #1a73e8; font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${pendingData.length}건)</p>`;
+            pendingData.forEach((data, index) => {
                 detailHtml += `
                     <div class="analysis-item">
                         <span>사진 ${index + 1}: ${data.date}</span>
@@ -190,6 +196,23 @@
             analysisResults.innerHTML = detailHtml;
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '사진 분석 시작';
+            applyBtn.style.display = 'block'; // 반영 버튼 표시
+        });
+
+        applyBtn.addEventListener('click', () => {
+            if (pendingData.length === 0) return;
+            
+            // 데이터 병합 및 UI 업데이트
+            currentData = [...currentData, ...pendingData];
+            updateUI();
+            
+            alert(`${pendingData.length}건의 데이터가 차트와 목록에 반영되었습니다.`);
+            
+            // 초기화
+            pendingData = [];
+            analysisResults.innerHTML = `<div class="analysis-empty">반영이 완료되었습니다. 새로운 사진을 분석할 수 있습니다.</div>`;
+            applyBtn.style.display = 'none';
+            photoInput.value = '';
         });
 
         // --- 3. UI 렌더링 및 탭 로직 ---
