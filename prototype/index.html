@@ -128,7 +128,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0205-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0210-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">🌙</button>
         <button class="icon-btn menu-btn" onclick="location.href='settings.html'" title="메뉴">☰</button>
     </div>
@@ -654,6 +654,8 @@
             
             if (currentTab === 'daily') {
                 const sortedData = [...currentData].sort((a, b) => a.date.localeCompare(b.date));
+                const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+                
                 sortedData.forEach((item, index) => {
                     let variationHtml = '<span class="variation same">-</span>';
                     if (index > 0) {
@@ -662,9 +664,15 @@
                         else if (diff < 0) variationHtml = `<span class="variation down">▼${Math.abs(diff)}</span>`;
                     }
                     
+                    const dateObj = new Date(item.date);
+                    const dayOfWeek = dateObj.getDay(); // 0: 일, 6: 토
+                    const dayName = weekDays[dayOfWeek];
+                    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                    const dateStyle = isWeekend ? 'color: var(--up-color);' : '';
+                    
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="date-col">${item.date}</td>
+                        <td class="date-col" style="${dateStyle}">${item.date} (${dayName})</td>
                         <td><span class="usage-val">${item.usage.toFixed(1)}</span></td>
                         <td>${variationHtml}</td>
                     `;
