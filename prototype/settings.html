@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - EnergyTracker</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: white;
+            --text-color: #333;
+            --secondary-text: #5f6368;
+            --border-color: #f1f3f4;
+            --primary-blue: #1a73e8;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --secondary-text: #9e9e9e;
+            --border-color: #333;
+            --primary-blue: #8ab4f8;
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: var(--text-color); background-color: var(--bg-color); transition: background-color 0.3s, color 0.3s; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        h1 { color: var(--primary-blue); text-align: center; margin-bottom: 30px; }
+        h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); padding: 0 10px; }
+        
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-info { flex: 1; }
+        .setting-title { font-weight: bold; display: block; }
+        .setting-desc { font-size: 12px; color: var(--secondary-text); }
+        
+        .version-info { text-align: center; font-size: 12px; color: var(--secondary-text); margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <button class="back-btn" onclick="location.href='index.html'">←</button>
+        <div style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-0140-kst</div>
+    </div>
+
+    <h1>설정</h1>
+
+    <div class="card">
+        <h3>일반 설정</h3>
+        <div class="setting-item">
+            <div class="setting-info">
+                <span class="setting-title">샘플 데이터 사용</span>
+                <span class="setting-desc">애플리케이션 테스트를 위해 미리 생성된 데이터를 사용합니다.</span>
+            </div>
+            <input type="checkbox" checked disabled>
+        </div>
+        <div class="setting-item">
+            <div class="setting-info">
+                <span class="setting-title">알림 설정</span>
+                <span class="setting-desc">전력 사용량 급증 시 알림을 받습니다.</span>
+            </div>
+            <input type="checkbox" disabled>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>시스템</h3>
+        <div class="setting-item">
+            <div class="setting-info">
+                <span class="setting-title">언어</span>
+                <span class="setting-desc">한국어 (기본값)</span>
+            </div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-info">
+                <span class="setting-title">데이터 초기화</span>
+                <span class="setting-desc">모든 로컬 데이터를 삭제합니다.</span>
+            </div>
+            <button style="color: #ea4335; border: 1px solid #ea4335; background: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">초기화</button>
+        </div>
+    </div>
+
+    <div class="version-info">
+        EnergyTracker Prototype<br>
+        © 2026 danielk0121
+    </div>
+
+    <script>
+        // 메인 페이지의 테마 설정을 따름 (추후 로컬 스토리지 연동 필요)
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
