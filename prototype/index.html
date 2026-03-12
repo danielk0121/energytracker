@@ -53,7 +53,6 @@
         .value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; z-index: 3; }
         .bar.max .value-label { color: #ea4335; }
         .bar.min .value-label { color: #34a853; }
-        .arrow { font-size: 12px; }
 
         .monthly .bar { min-width: 50px; }
         
@@ -136,13 +135,10 @@
     <script>
         // --- 1. 데이터 생성 및 관리 ---
         
-        // 13개월치 (약 400일) 고정 샘플 데이터 생성 함수
         const generate13MonthsData = () => {
             const data = [];
             const endDate = new Date("2026-03-12");
             const startDate = new Date("2025-02-01");
-            
-            // 패턴을 위한 의사 난수 생성기 (seed 기반)
             let seed = 12345;
             const pseudoRandom = () => {
                 seed = (seed * 9301 + 49297) % 233280;
@@ -150,12 +146,10 @@
             };
 
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                // 월별 계절 패턴 반영 (여름/겨울에 사용량 증가)
                 const month = d.getMonth();
                 let seasonalBoost = 0;
-                if (month === 6 || month === 7) seasonalBoost = 5; // 여름 (7, 8월)
-                if (month === 11 || month === 0) seasonalBoost = 4; // 겨울 (12, 1월)
-                
+                if (month === 6 || month === 7) seasonalBoost = 5;
+                if (month === 11 || month === 0) seasonalBoost = 4;
                 const usage = parseFloat((pseudoRandom() * 6 + 4 + seasonalBoost).toFixed(1));
                 data.push({
                     date: d.toISOString().split('T')[0],
@@ -282,7 +276,6 @@
             const yAxis = document.getElementById(yAxisId);
             const container = document.getElementById(containerId);
             yAxis.innerHTML = '';
-            
             container.querySelectorAll('.grid-line').forEach(el => el.remove());
 
             const step = maxUsage > 100 ? 50 : (maxUsage > 30 ? 10 : 5);
@@ -359,26 +352,22 @@
                 if (item.usage === maxUsage || item.usage === minUsage) {
                     const valLabel = document.createElement('div');
                     valLabel.className = 'value-label';
-                    const arrow = item.usage === maxUsage ? '↑' : '↓';
-                    valLabel.innerHTML = `<span>${item.usage}</span><span class="arrow">${arrow}</span>`;
+                    valLabel.innerHTML = `<span>${item.usage}</span>`;
                     bar.appendChild(valLabel);
                 }
 
                 const label = document.createElement('div');
                 label.className = 'bar-label';
                 const [y, m, d] = item.date.split('-');
-                
                 let labelHtml = `${m}/${d}`;
                 if (index === 0 || y !== lastYear) {
                     labelHtml += `<br>${y}`;
                     lastYear = y;
                 }
-                
                 label.innerHTML = labelHtml;
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
-            
             setTimeout(() => { container.scrollLeft = container.scrollWidth; }, 100);
         };
 
@@ -393,7 +382,7 @@
             const maxVal = drawYAxisAndGrid('monthly-chart', 'monthly-y-axis', maxUsage);
             container.querySelectorAll('.bar').forEach(el => el.remove());
 
-            months.forEach((month, index) => {
+            months.forEach((month) => {
                 const usage = monthlyMap[month];
                 const bar = document.createElement('div');
                 bar.className = 'bar';
@@ -407,8 +396,7 @@
                 if (usage === maxUsage || usage === minUsage) {
                     const valLabel = document.createElement('div');
                     valLabel.className = 'value-label';
-                    const arrow = usage === maxUsage ? '↑' : '↓';
-                    valLabel.innerHTML = `<span>${usage.toFixed(1)}</span><span class="arrow">${arrow}</span>`;
+                    valLabel.innerHTML = `<span>${usage.toFixed(1)}</span>`;
                     bar.appendChild(valLabel);
                 }
 
@@ -416,11 +404,9 @@
                 label.className = 'bar-label';
                 const [y, m] = month.split('-');
                 label.innerHTML = `${m}월<br>${y}`;
-                
                 bar.appendChild(label);
                 container.appendChild(bar);
             });
-            
             setTimeout(() => { container.scrollLeft = container.scrollWidth; }, 100);
         };
 
@@ -436,7 +422,6 @@
         const renderUsageList = () => {
             const tbody = document.getElementById('usage-list-body');
             tbody.innerHTML = '';
-            
             if (currentTab === 'daily') {
                 const sortedData = [...currentData].sort((a, b) => b.date.localeCompare(a.date));
                 sortedData.forEach(item => {
@@ -455,7 +440,6 @@
             }
         };
 
-        // 초기 실행
         updateUI();
         setupDragScroll('daily-chart');
         setupDragScroll('monthly-chart');
