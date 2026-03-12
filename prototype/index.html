@@ -50,9 +50,10 @@
         .summary-max { color: var(--up-color); font-weight: bold; }
         .summary-min { color: var(--down-color); font-weight: bold; }
 
-        /* 필터 버튼 그룹 */
-        .filter-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .filter-btn { background-color: var(--border-color); border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; width: auto; }
+        /* 필터 버튼 그룹 (한 줄 표시 강제) */
+        .filter-group { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: nowrap; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+        .filter-group::-webkit-scrollbar { display: none; }
+        .filter-btn { background-color: var(--border-color); border: none; padding: 6px 10px; border-radius: 15px; font-size: 11px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
         .filter-btn.active { background-color: var(--primary-blue); color: white; }
 
         /* 업로드 섹션 */
@@ -75,7 +76,7 @@
 
         /* 분석 결과 섹션 */
         #analysis-results { min-height: 50px; background: var(--chart-bg); border-radius: 8px; font-size: 14px; padding: 10px; border: 1px solid var(--border-color); }
-        .analysis-empty { color: var(--secondary-text); text-align: center; padding: 15px 0; font-style: italic; }
+        .analysis-empty { color: var(--secondary-text); text-align: center; padding: 15px 0; font-style: italic; line-height: 1.5; }
         .analysis-item { padding: 8px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
         .analysis-item:last-child { border-bottom: none; }
         .analysis-item strong { color: var(--primary-blue); }
@@ -140,7 +141,7 @@
     <div class="card">
         <h3>사진 분석 결과</h3>
         <div id="analysis-results">
-            <div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>
+            <div class="analysis-empty">업로드된 사진이 없습니다.<br>분석을 시작해주세요.</div>
         </div>
         <div class="btn-group">
             <button id="apply-btn" class="btn-apply">데이터 반영하기</button>
@@ -339,7 +340,7 @@
             if (!confirm('업로드된 사진과 분석 결과를 초기화하시겠습니까?')) return;
             photoInput.value = '';
             thumbnailPreview.innerHTML = '';
-            analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다. 분석을 시작해주세요.</div>`;
+            analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다.<br>분석을 시작해주세요.</div>`;
             pendingData = [];
             applyBtn.style.display = 'none';
             applyBtn.disabled = false;
