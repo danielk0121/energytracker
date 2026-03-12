@@ -20,7 +20,7 @@
         /* 썸네일 미리보기 */
         .thumbnail-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 15px; }
         .thumbnail { width: calc(100% / 6 - 10px); aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; border: 1px solid #dadce0; background-color: #eee; }
-        @media (max-width: 400px) { .thumbnail { width: calc(100% / 4 - 10px); } } /* 모바일에서 너무 작아지지 않게 조정 */
+        @media (max-width: 400px) { .thumbnail { width: calc(100% / 4 - 10px); } }
 
         .btn-apply { background-color: #34a853; margin-top: 15px; display: none; }
         .btn-apply:hover { background-color: #2d8e47; }
@@ -43,14 +43,14 @@
         .chart-container::-webkit-scrollbar { display: none; }
         .chart-container { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 그리드 라인 */
-        .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #eee; z-index: 0; pointer-events: none; }
+        /* 그리드 라인 (막대보다 앞에 오도록 설정) */
+        .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(238, 238, 238, 0.8); z-index: 2; pointer-events: none; }
 
         .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
-        .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; }
+        .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
         
         /* 최소/최대 강조 라벨 */
-        .value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; }
+        .value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; z-index: 3; }
         .bar.max .value-label { color: #ea4335; }
         .bar.min .value-label { color: #34a853; }
         .arrow { font-size: 12px; }
@@ -165,7 +165,6 @@
         const applyBtn = document.getElementById('apply-btn');
         const analysisResults = document.getElementById('analysis-results');
 
-        // 사진 선택 시 썸네일 미리보기 생성
         photoInput.addEventListener('change', (e) => {
             thumbnailPreview.innerHTML = '';
             if (e.target.files) {
@@ -173,7 +172,7 @@
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(file);
                     img.className = 'thumbnail';
-                    img.onload = () => URL.revokeObjectURL(img.src); // 메모리 해제
+                    img.onload = () => URL.revokeObjectURL(img.src);
                     thumbnailPreview.appendChild(img);
                 });
             }
@@ -235,7 +234,7 @@
             analysisResults.innerHTML = `<div class="analysis-empty">반영이 완료되었습니다. 새로운 사진을 분석할 수 있습니다.</div>`;
             applyBtn.style.display = 'none';
             photoInput.value = '';
-            thumbnailPreview.innerHTML = ''; // 썸네일 초기화
+            thumbnailPreview.innerHTML = '';
         });
 
         // --- 3. UI 렌더링 및 탭 로직 ---
