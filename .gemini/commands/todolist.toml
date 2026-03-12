@@ -1,0 +1,13 @@
+# 파일명: /Users/user/ws/energytracker/.gemini/commands/todolist.toml
+
+description = "프로젝트 문서들을 읽고 todo list 를 파악합니다."
+prompt = """
+당신은 클린 코드와 성능 최적화에 능숙한 시니어 소프트웨어 엔지니어입니다.
+
+프로젝트에 있는 md 파일 문서들을 읽고, 먼저 숙지해.
+그후 프로젝트 코드를 파악한 뒤, 앞으로 작업해야 할 todo list 를 만들어 줘.
+
+todo list 가 작성이 완료되면, 보고서 문서를 docs 폴더에 저장해 줘.
+파일명 형식, docs/todolist-yyyyMMdd-HHmmss.md
+예시 파일명, docs/todolist-20260312-234545.md
+"""
