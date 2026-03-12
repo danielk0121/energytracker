@@ -36,7 +36,7 @@
         /* 차트 래퍼 및 y축 */
         .chart-wrapper { display: flex; height: 280px; background: #fafafa; border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; }
         .y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid #eee; font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; }
-        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 8px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; }
+        .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; }
         .chart-container:active { cursor: grabbing; }
         
         /* 스크롤바 숨기기 */
@@ -46,7 +46,8 @@
         /* 그리드 라인 (막대보다 앞에 오도록 설정) */
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(238, 238, 238, 0.8); z-index: 2; pointer-events: none; }
 
-        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 16px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
+        /* 막대 폭을 32px로 확장 */
+        .bar { background-color: #4285f4; border-radius: 4px 4px 0 0; min-width: 32px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
         .bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #70757a; white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
         
         /* 최소/최대 강조 라벨 */
@@ -186,7 +187,6 @@
                     let dayOffset = 1;
 
                     for (let i = 0; i < files.length; i++) {
-                        // 사진 1: 3개, 사진 2: 2개, 사진 3 이상: 1개
                         let dataCount = (i === 0) ? 3 : (i === 1 ? 2 : 1);
                         
                         for (let j = 0; j < dataCount; j++) {
