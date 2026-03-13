@@ -39,7 +39,7 @@ h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--bor
 .icon-btn:hover { background-color: var(--border-color); }
 
 /* 제목 우측 요약 정보 */
-.title-summary { font-size: 11px; font-weight: normal; text-align: right; line-height: 1.3; color: var(--secondary-text); }
+.title-summary { font-size: 12px; font-weight: normal; text-align: right; line-height: 1.3; color: var(--secondary-text); }
 .summary-max { color: var(--up-color); font-weight: bold; }
 .summary-min { color: var(--down-color); font-weight: bold; }
 
@@ -95,7 +95,7 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 
 /* 차트 래퍼 및 y축 */
 .chart-wrapper { display: flex; height: 280px; background: var(--chart-bg); border-radius: 8px; padding: 10px 10px 0 10px; position: relative; margin-bottom: 10px; overflow: hidden; }
-.y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 40px; padding-bottom: 50px; border-right: 1px solid var(--border-color); font-size: 10px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
+.y-axis { display: flex; flex-direction: column-reverse; justify-content: space-between; width: 44px; padding-bottom: 50px; border-right: 1px solid var(--border-color); font-size: 12px; color: #70757a; text-align: right; padding-right: 6px; box-sizing: border-box; line-height: 1.1; z-index: 10; background: var(--chart-bg); }
 .chart-container { flex: 1; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 50px; overflow-x: auto; overflow-y: hidden; position: relative; scroll-behavior: smooth; cursor: grab; z-index: 5; }
 .chart-container:active { cursor: grabbing; }
 .chart-container::-webkit-scrollbar { display: none; }
@@ -103,8 +103,8 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .grid-line { position: absolute; left: 50px; right: 10px; border-top: 1px dashed rgba(128, 128, 128, 0.2); z-index: 8; pointer-events: none; }
 
 .bar { background-color: var(--accent-blue); border-radius: 4px 4px 0 0; min-width: 32px; position: relative; cursor: pointer; z-index: 1; transition: transform 0.2s; pointer-events: none; }
-.bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--secondary-text); white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
-.value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; z-index: 3; }
+.bar-label { position: absolute; bottom: -42px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--secondary-text); white-space: nowrap; text-align: center; line-height: 1.2; z-index: 3; }
+.value-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; white-space: nowrap; display: flex; flex-direction: column; align-items: center; z-index: 3; }
 .bar.max .value-label { color: var(--up-color); }
 .bar.min .value-label { color: var(--down-color); }
 .monthly .bar { min-width: 32px; }
