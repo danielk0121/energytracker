@@ -76,8 +76,8 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 
 /* 썸네일 미리보기 */
 .thumbnail-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 15px; }
-.thumbnail { width: calc(100% / 6 - 10px); aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; border: 1px solid var(--border-color); background-color: #eee; }
-@media (max-width: 400px) { .thumbnail { width: calc(100% / 4 - 10px); } }
+.thumbnail { width: calc(100% / 4 - 10px); aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; border: 1px solid var(--border-color); background-color: #eee; }
+@media (max-width: 400px) { .thumbnail { width: calc(100% / 3 - 10px); } }
 
 .btn-group { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
 .btn-group button { width: auto; } /* 기본 width 100% 해제 */
