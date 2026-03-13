@@ -269,7 +269,7 @@ applyBtn.addEventListener('click', async () => {
 resetBtn.addEventListener('click', async () => {
     if (!confirm('분석 결과를 초기화하시겠습니까?')) return;
     analysisInstruction.style.display = 'none';
-    analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다.<br>분석을 시작해주세요.</div>`;
+    analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다.<br>사진을 추가하고 분석을 시작해주세요.</div>`;
     pendingData = [];
     applyBtn.style.display = 'none';
     applyBtn.disabled = false;
