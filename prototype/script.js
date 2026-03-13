@@ -233,7 +233,10 @@ analyzeBtn.addEventListener('click', async () => {
 });
 
 const renderAnalysisResults = () => {
-    let detailHtml = `<p style="color: var(--primary-blue); font-weight: bold; margin-bottom: 10px;">✅ 분석 완료 (${pendingData.length}건)</p>`;
+    let detailHtml = `
+        <p style="color: var(--primary-blue); font-weight: bold; margin-bottom: 5px;">✅ 분석 완료 (${pendingData.length}건)</p>
+        <p style="font-size: 13px; color: var(--secondary-text); margin-bottom: 10px;">분석한 사진에서 날짜별 에너지 사용량을 알아냈어요. 데이터를 차트에 반영 할 수 있어요.</p>
+    `;
     pendingData.forEach((data) => {
         detailHtml += `
             <div class="analysis-item">
