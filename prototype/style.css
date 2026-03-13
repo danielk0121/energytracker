@@ -51,20 +51,19 @@ h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--bor
 /* 업로드 섹션 */
 .upload-section { text-align: center; border: 2px dashed var(--border-color); background-color: var(--chart-bg); }
 .btn-file-select {
-    display: block;
-    width: auto;
-    padding: 12px 24px;
+    display: inline-block;
+    padding: 10px 24px;
     background-color: var(--card-bg);
     color: var(--primary-blue);
-    border: 1px dashed var(--primary-blue);
-    border-radius: 8px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 20px;
     text-align: center;
-    font-size: 15px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    margin: 15px auto;
+    margin: 10px auto;
     transition: all 0.2s ease;
-    max-width: 200px;
+    width: auto;
 }
 .btn-file-select:hover {
     background-color: var(--primary-blue);
