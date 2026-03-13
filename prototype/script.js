@@ -130,6 +130,7 @@ const loadState = async () => {
     renderThumbnails();
     if (uploadedFilesData.length > 0) {
         uploadResetBtn.style.display = 'block';
+        analyzeBtn.style.display = 'block';
         sampleImageContainer.style.display = 'none';
     }
     
@@ -170,6 +171,7 @@ photoInput.addEventListener('change', async (e) => {
         }
         renderThumbnails();
         uploadResetBtn.style.display = 'block';
+        analyzeBtn.style.display = 'block';
         await saveState();
     }
 });
@@ -282,6 +284,7 @@ uploadResetBtn.addEventListener('click', async () => {
     sampleImageContainer.style.display = 'block';
     renderThumbnails();
     uploadResetBtn.style.display = 'none';
+    analyzeBtn.style.display = 'none';
     await saveState();
 });
 

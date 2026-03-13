@@ -78,7 +78,7 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .btn-group { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
 .btn-group button { width: auto; } /* 기본 width 100% 해제 */
 
-#analyze-btn { flex: 3; }
+#analyze-btn { flex: 3; display: none; }
 #upload-reset-btn { flex: 1; min-width: 80px; display: none; background-color: var(--secondary-text); }
 
 .btn-apply { background-color: #34a853; flex: 3; display: none; }
