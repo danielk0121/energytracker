@@ -56,7 +56,7 @@ body.dark-mode .guide-card { background-color: #1a2333; border-color: #2c3e50; }
 
 /* 필터 버튼 그룹 */
 .filter-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-.filter-btn { background-color: var(--border-color); border: 1px solid transparent; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; width: auto; min-width: 60px; font-weight: 500; }
+.filter-btn { background-color: var(--border-color); border: 1px solid transparent; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--secondary-text); transition: all 0.2s; width: auto; min-width: 50px; font-weight: 500; }
 .filter-btn.active { background-color: var(--primary-blue); color: white; border-color: var(--primary-blue); box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2); }
 
 /* 업로드 섹션 */
