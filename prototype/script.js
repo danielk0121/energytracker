@@ -153,6 +153,7 @@ const uploadResetBtn = document.getElementById('upload-reset-btn');
 const applyBtn = document.getElementById('apply-btn');
 const resetBtn = document.getElementById('reset-btn');
 const analysisResults = document.getElementById('analysis-results');
+const analysisInstruction = document.getElementById('analysis-instruction');
 
 photoInput.addEventListener('change', async (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -233,8 +234,8 @@ analyzeBtn.addEventListener('click', async () => {
 });
 
 const renderAnalysisResults = () => {
+    analysisInstruction.style.display = 'block';
     let detailHtml = `
-        <p style="font-size: 13px; color: var(--secondary-text); margin-bottom: 10px;">분석한 사진에서 날짜별 에너지 사용량을 알아냈어요. 데이터를 차트에 반영 할 수 있어요.</p>
         <p style="color: var(--primary-blue); font-weight: bold; margin-bottom: 5px;">✅ 분석 완료 (${pendingData.length}건)</p>
     `;
     pendingData.forEach((data) => {
@@ -259,6 +260,7 @@ applyBtn.addEventListener('click', async () => {
 
 resetBtn.addEventListener('click', async () => {
     if (!confirm('분석 결과를 초기화하시겠습니까?')) return;
+    analysisInstruction.style.display = 'none';
     analysisResults.innerHTML = `<div class="analysis-empty">업로드된 사진이 없습니다.<br>분석을 시작해주세요.</div>`;
     pendingData = [];
     applyBtn.style.display = 'none';
