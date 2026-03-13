@@ -48,6 +48,9 @@ body.dark-mode .guide-card { background-color: #1a2333; border-color: #2c3e50; }
 .guide-footer { margin-top: 10px; font-size: 11px; color: var(--secondary-text); font-style: italic; }
 .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--secondary-text); padding: 0 5px; width: auto; line-height: 1; }
 .close-btn:hover { color: var(--up-color); }
+
+/* 제목 우측 요약 정보 */
+.title-summary { font-size: 14px; font-weight: normal; text-align: right; line-height: 1.3; color: var(--secondary-text); }
 .summary-max { color: var(--up-color); font-weight: bold; }
 .summary-min { color: var(--down-color); font-weight: bold; }
 
