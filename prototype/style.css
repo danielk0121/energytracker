@@ -50,7 +50,27 @@ h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--bor
 
 /* 업로드 섹션 */
 .upload-section { text-align: center; border: 2px dashed var(--border-color); background-color: var(--chart-bg); }
-input[type="file"] { display: block; width: 100%; margin: 15px 0; }
+.btn-file-select {
+    display: block;
+    width: auto;
+    padding: 12px 24px;
+    background-color: var(--card-bg);
+    color: var(--primary-blue);
+    border: 1px dashed var(--primary-blue);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 15px auto;
+    transition: all 0.2s ease;
+    max-width: 200px;
+}
+.btn-file-select:hover {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+}
+input[type="file"] { display: none; }
 button { background-color: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500; transition: background-color 0.2s; }
 button:hover { background-color: var(--accent-blue); }
 button:disabled { background-color: #ccc; cursor: not-allowed; }

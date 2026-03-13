@@ -131,6 +131,7 @@ const loadState = async () => {
     if (uploadedFilesData.length > 0) {
         uploadResetBtn.style.display = 'block';
         sampleImageContainer.style.display = 'none';
+        fileSelectBtn.style.display = 'none';
     }
     
     if (pendingData.length > 0) {
@@ -158,10 +159,12 @@ const resetBtn = document.getElementById('reset-btn');
 const analysisResults = document.getElementById('analysis-results');
 const analysisInstruction = document.getElementById('analysis-instruction');
 const sampleImageContainer = document.getElementById('sample-image-container');
+const fileSelectBtn = document.querySelector('.btn-file-select');
 
 photoInput.addEventListener('change', async (e) => {
     if (e.target.files && e.target.files.length > 0) {
         sampleImageContainer.style.display = 'none';
+        fileSelectBtn.style.display = 'none';
         const files = Array.from(e.target.files);
         for (const file of files) {
             const base64 = await fileToBase64(file);
@@ -279,6 +282,7 @@ uploadResetBtn.addEventListener('click', async () => {
     uploadedFilesData = [];
     photoInput.value = '';
     sampleImageContainer.style.display = 'block';
+    fileSelectBtn.style.display = 'block';
     renderThumbnails();
     uploadResetBtn.style.display = 'none';
     await saveState();
