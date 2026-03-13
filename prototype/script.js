@@ -216,7 +216,7 @@ analyzeBtn.addEventListener('click', async () => {
         return;
     }
 
-    alert('임시 데이터를 사용하여 분석을 진행합니다. (OCR 목함수 작동)');
+    alert('아직 사진 분석 기능이 개발중이라, 임시로 샘플 데이터를 사용할께요.');
     analyzeBtn.disabled = true;
     analyzeBtn.textContent = '이미지 분석 중...';
     applyBtn.style.display = 'none';
