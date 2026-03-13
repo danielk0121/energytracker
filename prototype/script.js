@@ -283,8 +283,6 @@ uploadResetBtn.addEventListener('click', async () => {
     uploadResetBtn.style.display = 'none';
     await saveState();
 });
-    await saveState();
-});
 
 // --- 4. UI 렌더링 및 필터 로직 ---
 const updateMonthlyFilter = async (filter) => {
