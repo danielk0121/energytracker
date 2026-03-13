@@ -128,7 +128,10 @@ const loadState = async () => {
     
     // 3. UI 복구
     renderThumbnails();
-    if (uploadedFilesData.length > 0) uploadResetBtn.style.display = 'block';
+    if (uploadedFilesData.length > 0) {
+        uploadResetBtn.style.display = 'block';
+        sampleImageContainer.style.display = 'none';
+    }
     
     if (pendingData.length > 0) {
         renderAnalysisResults();
@@ -154,9 +157,11 @@ const applyBtn = document.getElementById('apply-btn');
 const resetBtn = document.getElementById('reset-btn');
 const analysisResults = document.getElementById('analysis-results');
 const analysisInstruction = document.getElementById('analysis-instruction');
+const sampleImageContainer = document.getElementById('sample-image-container');
 
 photoInput.addEventListener('change', async (e) => {
     if (e.target.files && e.target.files.length > 0) {
+        sampleImageContainer.style.display = 'none';
         const files = Array.from(e.target.files);
         for (const file of files) {
             const base64 = await fileToBase64(file);
@@ -269,14 +274,15 @@ resetBtn.addEventListener('click', async () => {
     resetBtn.style.display = 'none';
     await saveState();
 });
-
 uploadResetBtn.addEventListener('click', async () => {
     if (!confirm('업로드된 사진 목록을 초기화하시겠습니까?')) return;
     uploadedFilesData = [];
     photoInput.value = '';
+    sampleImageContainer.style.display = 'block';
     renderThumbnails();
     uploadResetBtn.style.display = 'none';
-    await clearPhotosDB();
+    await saveState();
+});
     await saveState();
 });
 
