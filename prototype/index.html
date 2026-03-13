@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1714-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1725-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">
             <svg id="theme-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -41,6 +41,23 @@
     </div>
     
     <h1>에너지 트래커</h1>
+
+    <!-- 시작하기 가이드 -->
+    <div id="onboarding-guide" class="card guide-card">
+        <div class="guide-header">
+            <span class="guide-icon">💡</span>
+            <h3>에너지 트래커 시작하기</h3>
+            <button class="close-btn" onclick="closeGuide()" title="닫기">&times;</button>
+        </div>
+        <div class="guide-body">
+            <p><strong>1. 사진 촬영:</strong> 우리집 월패드(전력량 화면)를 선명하게 찍어주세요.</p>
+            <p><strong>2. 업로드:</strong> '사진추가' 버튼으로 여러 장의 사진을 한 번에 올릴 수 있습니다.</p>
+            <p><strong>3. 분석 및 반영:</strong> '분석 시작' 후 결과가 맞는지 확인하고 차트에 반영하세요!</p>
+        </div>
+        <div class="guide-footer">
+            * 샘플 데이터가 기본으로 제공되어 바로 앱을 둘러보실 수 있습니다.
+        </div>
+    </div>
 
     <!-- 1. 사진 업로드 섹션 -->
     <div class="card upload-section">

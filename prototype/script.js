@@ -29,6 +29,23 @@ function toggleTheme() {
     sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
+// --- 온보딩 가이드 로직 ---
+const closeGuide = () => {
+    const guide = document.getElementById('onboarding-guide');
+    if (guide) {
+        guide.style.display = 'none';
+        localStorage.setItem('onboardingGuideHidden', 'true');
+    }
+};
+
+const initGuide = () => {
+    const isHidden = localStorage.getItem('onboardingGuideHidden');
+    if (isHidden === 'true') {
+        const guide = document.getElementById('onboarding-guide');
+        if (guide) guide.style.display = 'none';
+    }
+};
+
 // --- 1. 데이터 생성 및 관리 ---
 const generateHistoricalData = () => {
     const data = [];
@@ -694,6 +711,7 @@ const renderUsageList = () => {
 
 // 초기화 시 상태 로드
 window.addEventListener('load', async () => {
+    initGuide();
     await loadState();
     if (!sessionStorage.getItem('energyTrackerMeta')) {
         updateUI();
