@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1725-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1736-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">
             <svg id="theme-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -81,6 +81,15 @@
     <!-- 사진 분석 결과 섹션 -->
     <div class="card">
         <h3>사진 분석 결과</h3>
+        <div id="analysis-progress-container" style="display: none; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--secondary-text); margin-bottom: 5px;">
+                <span id="progress-text">사진 분석 중...</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div style="height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden;">
+                <div id="progress-bar-fill" style="height: 100%; width: 0%; background-color: var(--primary-blue); transition: width 0.3s ease;"></div>
+            </div>
+        </div>
         <p id="analysis-instruction" style="font-size: 14px; color: var(--secondary-text); margin-bottom: 10px; display: none;">분석한 사진에서 날짜별 에너지 사용량을 알아냈어요. 데이터를 차트에 반영 할 수 있어요.</p>
         <div id="analysis-results">
             <div class="analysis-empty">업로드된 사진이 없습니다.<br>사진을 추가하고 분석을 시작해주세요.</div>

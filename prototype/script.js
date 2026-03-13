@@ -273,6 +273,27 @@ analyzeBtn.addEventListener('click', async () => {
     resetBtn.style.display = 'block';
     analysisResults.innerHTML = `<div class="analysis-empty"><strong>${uploadedFilesData.length}장</strong>의 사진을 분석하고 있습니다...</div>`;
 
+    // 프로그레스 바 초기화 및 표시
+    const progressContainer = document.getElementById('analysis-progress-container');
+    const progressBarFill = document.getElementById('progress-bar-fill');
+    const progressPercent = document.getElementById('progress-percent');
+    const progressText = document.getElementById('progress-text');
+    
+    progressContainer.style.display = 'block';
+    const updateProgress = (percent, text) => {
+        progressBarFill.style.width = `${percent}%`;
+        progressPercent.textContent = `${percent}%`;
+        progressText.textContent = text;
+    };
+
+    updateProgress(10, '사진을 읽어오는 중...');
+    await new Promise(r => setTimeout(r, 400));
+    updateProgress(40, '이미지 특징 추출 중...');
+    await new Promise(r => setTimeout(r, 600));
+    updateProgress(75, '숫자 및 날짜 인식 중...');
+    await new Promise(r => setTimeout(r, 500));
+    updateProgress(100, '분석 완료!');
+    
     pendingData = await mockAnalyzeImage(uploadedFilesData);
     renderAnalysisResults();
     
@@ -280,6 +301,11 @@ analyzeBtn.addEventListener('click', async () => {
     analyzeBtn.textContent = '사진 분석 시작';
     applyBtn.style.display = 'block'; 
     await saveState();
+    
+    // 분석 완료 후 잠시 뒤 프로그레스 바 숨김
+    setTimeout(() => {
+        progressContainer.style.display = 'none';
+    }, 2000);
 });
 
 const renderAnalysisResults = () => {
