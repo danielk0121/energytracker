@@ -38,6 +38,15 @@ const closeGuide = () => {
     }
 };
 
+const showGuide = () => {
+    const guide = document.getElementById('onboarding-guide');
+    if (guide) {
+        guide.style.display = 'block';
+        localStorage.removeItem('onboardingGuideHidden');
+        guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
+
 const initGuide = () => {
     const isHidden = localStorage.getItem('onboardingGuideHidden');
     if (isHidden === 'true') {
