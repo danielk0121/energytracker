@@ -17,7 +17,7 @@
 </head>
 <body>
     <div class="theme-toggle-container">
-        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1736-kst</span>
+        <span style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1748-kst</span>
         <button class="icon-btn theme-btn" onclick="toggleTheme()" title="테마 전환">
             <svg id="theme-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
@@ -64,9 +64,20 @@
         <h3>월패드 사진 업로드</h3>
         <p style="font-size: 14px; color: var(--secondary-text);">우리집 전기 사용량 사진을 찍어서 올리세요 !<br>날짜별 사용량 통계를 분석합니다.<br>한번에 여러장의 사진을 선택할 수 있습니다.</p>
         
-        <div id="sample-image-container" style="margin: 15px 0; text-align: center;">
-            <p style="font-size: 12px; color: var(--secondary-text); margin-bottom: 5px;">업로드 사진 예시</p>
-            <img src="wallpad_sample.png" alt="업로드 사진 예시" style="width: 300px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div id="sample-image-container" class="sample-image-container">
+            <p class="sample-title">📸 업로드 꿀팁</p>
+            <div class="sample-grid">
+                <div class="sample-item">
+                    <img src="wallpad_sample.png" alt="좋은 예시">
+                    <span class="sample-tag good">GOOD</span>
+                    <p>정면에서 선명하게</p>
+                </div>
+                <div class="sample-item">
+                    <div class="sample-bad-placeholder">흔들린 사진</div>
+                    <span class="sample-tag bad">BAD</span>
+                    <p>흔들림/빛반사 주의</p>
+                </div>
+            </div>
         </div>
 
         <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
