@@ -6,7 +6,7 @@
     <title>설정 - 에너지트래커</title>
     <style>
         :root {
-            --bg-color: #f0f2f5;
+            --bg-color: #f5f7f9;
             --card-bg: white;
             --text-color: #333;
             --secondary-text: #5f6368;
@@ -24,12 +24,13 @@
         }
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; color: var(--text-color); background-color: var(--bg-color); transition: background-color 0.3s, color 0.3s; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--border-color); }
         h1 { color: var(--primary-blue); text-align: center; margin-bottom: 30px; }
         h3 { margin-top: 0; color: var(--text-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
         
         .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); padding: 0 10px; }
+        .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+        .back-btn:hover { background-color: var(--border-color); }
         
         .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
         .setting-item:last-child { border-bottom: none; }
@@ -42,8 +43,13 @@
 </head>
 <body>
     <div class="header-container">
-        <button class="back-btn" onclick="location.href='index.html'">←</button>
-        <div style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1653-kst</div>
+        <button class="back-btn" onclick="location.href='index.html'" title="뒤로 가기">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </button>
+        <div style="font-size: 10px; color: var(--secondary-text);">danielk0121 v-260313-1715-kst</div>
     </div>
 
     <h1>설정</h1>
