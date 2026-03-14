@@ -41,9 +41,13 @@ const closeGuide = () => {
 const showGuide = () => {
     const guide = document.getElementById('onboarding-guide');
     if (guide) {
+        // 이미 표시 중이면 닫기 (토글)
+        if (guide.style.display !== 'none') {
+            closeGuide();
+            return;
+        }
         guide.style.display = 'block';
         localStorage.removeItem('onboardingGuideHidden');
-        guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 };
 
